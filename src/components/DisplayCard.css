@@ -1,0 +1,69 @@
+/* components/DisplayCard.css */
+.display-card {
+    /* ... все ваши существующие стили остаются ... */
+    aspect-ratio: 1;
+    background-color: #6a0dad;
+    color: white;
+    border-radius: 10px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+
+    /* Общие настройки фона - ОСТАВЛЯЕМ */
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: 60%;
+    background-position: calc(100% + 20px) calc(100% + 10px);
+
+  }
+
+  .display-card:hover {
+      transform: scale(1.05);
+  }
+
+
+  /* Остальные стили без изменений */
+  .card-info-content,
+  .card-button {
+    position: relative;
+    z-index: 1;
+  }
+
+   .card-info-content {
+     margin-bottom: 15px;
+   }
+
+  .display-card p {
+     margin: 0 0 8px 0;
+     line-height: 1.5;
+   }
+
+   .display-card strong {
+     font-size: 1.4em;
+     font-weight: 600;
+     display: block;
+     margin-bottom: 12px;
+   }
+
+   .card-button {
+     padding: 10px 25px;
+     border: none;
+     border-radius: 6px;
+     cursor: pointer;
+     font-weight: bold;
+     font-size: 1em;
+     align-self: flex-start;
+     margin-top: auto;
+     transition: background-color 0.2s ease;
+     background-color: #ffcc00;
+     color: #333;
+   }
+   .card-button:hover {
+     background-color: #e6b800;
+   }
