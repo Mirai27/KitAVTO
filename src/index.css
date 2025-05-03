@@ -11,4 +11,8 @@
   .bg-accent {
     background-color: rgb(var(--color-primary));
   }
+  
+  .filter-input {
+    @apply w-full p-2 border border-gray-300 rounded-md focus:ring-[rgb(100,24,127)] focus:border-[rgb(100,24,127)];
+  }
 }

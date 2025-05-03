@@ -35,7 +35,7 @@ export default function Sell() {
         {/* Intro section */}
         {!formVisible && (
           <>
-            <section className="mb-12 text-center bg-white p-8 rounded-2xl shadow-md">
+            <section className="mb-12 bg-white p-6 rounded-2xl shadow-md">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 Продать машину
               </h1>
@@ -50,7 +50,7 @@ export default function Sell() {
               </button>
             </section>
 
-            <section className="mb-12 bg-accent text-white p-6 rounded-xl">
+            <section className="mb-12 bg-accent text-white p-6 rounded-xl shadow-md">
               <h2 className="text-xl font-semibold mb-2">
                 Почему стоит продать свой автомобиль именно у нас?
               </h2>
