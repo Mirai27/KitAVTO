@@ -2,6 +2,7 @@ import DisplayCard from "../components/DisplayCard";
 import { cards_info } from "../data";
 import { useEffect, useState } from "react";
 import CarCard from "../components/CarCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const baseLimit = 4; // Initial number of cars to load
@@ -12,7 +13,9 @@ export default function Home() {
   useEffect(() => {
     async function fetchSuperOffers() {
       try {
-        const response = await fetch(`/api/main_page/superoffers?limit=${limit}`);
+        const response = await fetch(
+          `/api/main_page/superoffers?limit=${limit}`
+        );
         const data = await response.json();
         setSuperOffers(data);
       } catch (error) {
@@ -30,10 +33,12 @@ export default function Home() {
   return (
     <main className="bg-gray-50 py-4">
       <section className="container mx-auto px-4 transition-normal duration-300 ease-out">
-        <ul className="flex md:grid overflow-x-auto md:overflow-visible md:grid-cols-3 gap-4 list-none p-0 pb-4">
-          {cards_info.map((card_info) => (
-            <DisplayCard key={card_info.title} {...card_info} />
-          ))}
+        <ul className="flex md:grid overflow-x-auto md:overflow-visible md:grid-cols-3 gap-4 list-none p-0 pb-4 ">
+          <AnimatePresence>
+            {cards_info.map((card_info) => (
+              <DisplayCard key={card_info.title} {...card_info} />
+            ))}
+          </AnimatePresence>
         </ul>
       </section>
       <section className="container mx-auto px-4 mt-8 transition-normal duration-300 ease-out">

@@ -4,6 +4,10 @@
   --color-primary: 100, 24, 127; /* RGB значения для #64187f */
 }
 
+html {
+  overflow-y: scroll; /* Всегда резервируем место для вертикального скроллбара */
+}
+
 @layer utilities {
   .text-primary {
     color: rgb(var(--color-primary));
