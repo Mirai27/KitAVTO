@@ -1,18 +1,14 @@
+@import "tailwindcss";
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  /* line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424; */
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-primary: 100, 24, 127; /* RGB значения для #64187f */
 }
 
-body {
-  margin: 40px;
+@layer utilities {
+  .text-primary {
+    color: rgb(var(--color-primary));
+  }
+  .bg-accent {
+    background-color: rgb(var(--color-primary));
+  }
 }

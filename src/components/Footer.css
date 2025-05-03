@@ -1,93 +1,26 @@
 /* Footer.css */
-.footer {
-  background-color: #ffffff;
-  padding: 2rem 0;
-  color: #333;
-  font-family: "Arial", sans-serif;
-}
+@import "tailwindcss";
 
-.footer-container {
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+.footer-link {
+  @apply transition-colors cursor-pointer text-base text-gray-600;
 
-.footer-header {
-  margin-bottom: 2rem;
-  text-align: center;
+  &:hover {
+    @apply text-blue-600;
+  }
 }
 
 .footer-title {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: #000;
+  @apply text-4xl font-semibold text-black mb-2;
 }
 
 .footer-subtitle {
-  font-size: 1rem;
-  color: #666;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.footer-column {
-  text-align: center;
+  @apply text-lg text-gray-600;
 }
 
 .footer-column-title {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #000;
+  @apply text-xl font-semibold text-black mb-4;
 }
 
 .footer-list {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-list li {
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.footer-list li:hover {
-  color: #007bff;
-}
-
-.footer-bottom {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #ddd;
-}
-
-.footer-link {
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.footer-link:hover {
-  color: #007bff;
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 768px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-column {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .footer-column:last-child {
-    margin-bottom: 0;
-  }
+  @apply space-y-2;
 }

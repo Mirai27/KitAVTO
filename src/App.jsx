@@ -1,24 +1,30 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import "./App.css";
-import { cards_info } from "./data";
-import DisplayCard from "./components/DisplayCard";
+import { Routes, Route, useLocation } from "react-router-dom";
+import Home from "./pages/Home";
+import Sell from "./pages/Sell";
+import Finance from "./pages/Finance";
+import Buy from "./pages/Buy";
+import PageTransition from "./components/PageTransition";
 
 function App() {
+  const location = useLocation();
+  
   return (
-    <>
+    <div className="app">
       <Header />
-      <main>
-        <section>
-          <ul>
-            {cards_info.map((card_info) => (
-              <DisplayCard key={card_info.title} {...card_info} />
-            ))}
-          </ul>
-        </section>
-      </main>
+      <div className="page-content">
+        <PageTransition>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/finance" element={<Finance />} />
+            <Route path="/buy" element={<Buy />} />
+          </Routes>
+        </PageTransition>
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }
 

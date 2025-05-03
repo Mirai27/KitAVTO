@@ -1,51 +1,41 @@
-import './DisplayCard.css';
-
-// --- Импортируем SVG ---
-// Укажите ПРАВИЛЬНЫЙ ОТНОСИТЕЛЬНЫЙ ПУТЬ от DisplayCard.jsx к вашим SVG файлам
-// Пример: если DisplayCard.jsx в src/components, а SVG в src/assets:
-import pattern1SvgPath from '/pattern1.svg?url';
-import pattern2SvgPath from '/pattern2.svg?url';
-// Если структура другая, скорректируйте путь (например, '../../assets/pattern1.svg')
-
-function handleCardAction(link, title) {
-  console.log(`Нажата кнопка '${title}', ссылка/действие: ${link}`);
-}
+import { useNavigate } from "react-router-dom";
+import pattern1SvgPath from "/pattern1.svg?url";
+import pattern2SvgPath from "/pattern2.svg?url";
 
 export default function DisplayCard(props) {
+  const navigate = useNavigate();
+
+  const handleCardAction = (link, title) => {
+    navigate(link);
+  };
+
   const { title, description, buttonText, link, backgroundType } = props;
 
-  // --- Выбираем нужный путь к SVG ---
-  let svgUrl = '';
-  if (backgroundType === 'pattern1') {
-    svgUrl = pattern1SvgPath;
-  } else if (backgroundType === 'pattern2') {
-    svgUrl = pattern2SvgPath;
-  }
-
-  // --- Создаем объект инлайн-стилей ---
-  const cardStyle = {
-    // Устанавливаем backgroundImage, если svgUrl определен
-    backgroundImage: svgUrl ? `url(${svgUrl})` : 'none',
-  };
-  console.log(cardStyle)
-  if (!buttonText) {
-      console.warn(`Карточка "${title}" не имеет buttonText.`);
-  }
+  const svgUrl =
+    backgroundType === "pattern1"
+      ? pattern1SvgPath
+      : backgroundType === "pattern2"
+      ? pattern2SvgPath
+      : null;
 
   return (
-    // --- Применяем инлайн-стили к li ---
-    // Базовый класс 'display-card' оставляем для общих стилей из CSS
-    <li className="display-card" style={cardStyle}>
-      <div className="card-info-content">
-        <p>
-          <strong>{title}</strong>
-        </p>
-        <p>{description}</p>
+    <li
+      className="flex flex-col justify-between p-6 bg-primary text-white min-h-70 min-w-70 md:min-w-60 rounded-lg shadow-lg h-full"
+      style={{
+        backgroundImage: svgUrl ? `url("${svgUrl}")` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="flex-grow flex flex-col">
+        <h2 className="text-2xl md:text-4xl font-bold mb-3">{title}</h2>
+        <p className="text-lg md:text-xl flex-grow">{description}</p>
       </div>
 
       {buttonText && (
         <button
-          className="card-button"
+          className="text-xl mt-6 px-6 py-3 bg-accent hover:bg-yellow-500 text-white font-bold rounded-lg transition-colors w-full"
           onClick={() => handleCardAction(link, title)}
         >
           {buttonText}
