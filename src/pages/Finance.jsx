@@ -24,7 +24,7 @@ export default function Finance() {
         </section>
 
         <section
-          className="mb-12 bg-[url('/public/consultation.svg')] bg-cover bg-[position:-150px] bg-no-repeat bg-white flex items-center justify-end"
+          className="mb-12 rounded-xl shadow-md bg-[url('/public/consultation.svg')] bg-cover bg-[position:-150px] bg-no-repeat bg-white flex items-center justify-end"
           style={{ minHeight: '600px' }}
         >
           <div className="w-full max-w-md">

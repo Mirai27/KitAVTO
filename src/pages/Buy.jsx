@@ -59,7 +59,7 @@ export default function Buy() {
           console.error("Car data error:", data.detail);
           return;
         }
-        setCars(data);
+        setCars(data); // Обновляем список машин
       } catch (err) {
         console.error("Fetch car data error:", err);
       } finally {
@@ -68,7 +68,7 @@ export default function Buy() {
     }
 
     fetchCars();
-  }, [limit]);
+  }, [filters, limit]); // Добавляем filters в зависимости
 
   const handleLoadMore = () => {
     setLimit((prevLimit) => prevLimit + shiftLimit);

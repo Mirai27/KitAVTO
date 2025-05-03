@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import CarCard from "../components/CarCard";
 
 export default function Home() {
+  const baseLimit = 4; // Initial number of cars to load
+  const shiftLimit = 4; // Number of cars to load on each button click
   const [superOffers, setSuperOffers] = useState([]);
-  const [limit, setLimit] = useState(4);
+  const [limit, setLimit] = useState(baseLimit);
 
   useEffect(() => {
     async function fetchSuperOffers() {
@@ -22,7 +24,7 @@ export default function Home() {
   }, [limit]);
 
   const handleLoadMore = () => {
-    setLimit((prevLimit) => prevLimit + 4);
+    setLimit((prevLimit) => prevLimit + shiftLimit);
   };
 
   return (

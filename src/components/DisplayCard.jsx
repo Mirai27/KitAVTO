@@ -5,8 +5,8 @@ import pattern2SvgPath from "/pattern2.svg?url";
 export default function DisplayCard(props) {
   const navigate = useNavigate();
 
-  const handleCardAction = (link, title) => {
-    navigate(link);
+  const handleCardAction = (link) => {
+    navigate(link); // Переход по ссылке
   };
 
   const { title, description, buttonText, link, backgroundType } = props;
@@ -36,7 +36,7 @@ export default function DisplayCard(props) {
       {buttonText && (
         <button
           className="text-xl mt-6 px-6 py-3 bg-accent hover:bg-yellow-500 text-white font-bold rounded-lg transition-colors w-full"
-          onClick={() => handleCardAction(link, title)}
+          onClick={() => handleCardAction(link)} // Переход по ссылке
         >
           {buttonText}
         </button>

@@ -16,13 +16,13 @@ const CarCard = ({ car }) => {
     >
       <div className="h-48 bg-gray-100 flex items-center justify-center">
         <img
-          src={car.image || "/placeholder-car.jpg"}
+          src={"/api/images" + car.image_url || "/placeholder-car.jpg"}
           alt={car.name}
           className="h-full w-full object-contain"
         />
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-semibold">{car.name}</h3>
+        <h3 className="text-lg font-semibold">{car.brand + " " + car.model}</h3>
         <p className="text-gray-600 text-sm">{car.type}</p>
         <div className="flex items-center mt-2 text-sm text-gray-500">
           <span className="mr-3">{car.seats}</span>

@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import Sell from "./pages/Sell";
 import Finance from "./pages/Finance";
 import Buy from "./pages/Buy";
+import Rent from "./pages/Rent";
+import Reviews from "./pages/Reviews"; // Импортируем Reviews
 import PageTransition from "./components/PageTransition";
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
             <Route path="/sell" element={<Sell />} />
             <Route path="/finance" element={<Finance />} />
             <Route path="/buy" element={<Buy />} />
+            <Route path="/rent" element={<Rent />} />
+            <Route path="/reviews" element={<Reviews />} /> {/* Новый маршрут */}
           </Routes>
         </PageTransition>
       </div>
