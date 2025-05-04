@@ -24,16 +24,54 @@ const faqs = [
 export default function Sell() {
   const [formVisible, setFormVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(false);
+  const [commentVisible, setCommentVisible] = useState(false); // Для отображения поля комментария
+  const [comment, setComment] = useState(""); // Для хранения текста комментария
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/images/upload_image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.location) {
+        setUploadedImage("/api" + data.location);
+      } else {
+        alert("Ошибка при загрузке изображения.");
+      }
+    } catch (error) {
+      console.error("Ошибка при загрузке изображения:", error);
+    }
+  };
+
+  const handlePublish = () => {
+    setSuccessMessage(true);
+    setFormVisible(false);
+  };
+
+  const handleTextareaInput = (e) => {
+    setComment(e.target.value);
+    e.target.style.height = "auto"; // Сбрасываем высоту
+    e.target.style.height = `${e.target.scrollHeight}px`; // Устанавливаем высоту в зависимости от содержимого
   };
 
   return (
     <main className="bg-gray-50 py-4">
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
         {/* Intro section */}
-        {!formVisible && (
+        {!formVisible && !successMessage && (
           <>
             <section className="mb-12 bg-white p-6 rounded-2xl shadow-md">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
@@ -64,6 +102,18 @@ export default function Sell() {
           </>
         )}
 
+        {/* Success message */}
+        {successMessage && (
+          <section className="mb-12 bg-green-100 p-6 rounded-2xl shadow-md text-center">
+            <h1 className="text-2xl font-bold text-green-700 mb-4">
+              Объявление отправлено!
+            </h1>
+            <p className="text-lg text-green-600">
+              Ваше объявление успешно отправлено. Спасибо за использование нашей платформы!
+            </p>
+          </section>
+        )}
+
         {/* Form section */}
         {formVisible && (
           <>
@@ -73,12 +123,26 @@ export default function Sell() {
               </h1>
 
               <div className="flex items-center space-x-6 mb-6">
-                <div className="w-32 h-32 bg-gray-100 border rounded-xl flex items-center justify-center text-gray-400 text-3xl">
-                  <FaCamera />
+                <div className="w-32 h-32 bg-gray-100 border rounded-xl flex items-center justify-center text-gray-400 text-3xl overflow-hidden">
+                  {uploadedImage ? (
+                    <img
+                      src={uploadedImage}
+                      alt="Загруженное изображение"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaCamera />
+                  )}
                 </div>
-                <button className="text-purple-600 font-medium underline">
+                <label className="text-purple-600 font-medium underline cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
                   Добавить фотографии
-                </button>
+                </label>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -98,19 +162,35 @@ export default function Sell() {
                 <input placeholder="Цена" className="input" />
               </div>
 
-              <button className="text-purple-600 font-medium underline mb-4">
+              <button
+                onClick={() => setCommentVisible(true)}
+                className="text-purple-600 font-medium underline mb-4"
+              >
                 Добавить комментарий
               </button>
 
+              {commentVisible && (
+                <textarea
+                  value={comment}
+                  onChange={handleTextareaInput}
+                  className="w-full border rounded px-3 py-2 mb-4"
+                  placeholder="Введите комментарий"
+                  style={{ minHeight: "200px", resize: "none", overflow: "hidden" }}
+                />
+              )}
+
               <div>
-                <button className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">
+                <button
+                  onClick={handlePublish}
+                  className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
+                >
                   Опубликовать объявление
                 </button>
               </div>
             </section>
 
             {/* FAQ section */}
-            <section className="mb-12 max-w-3xl mx-auto">
+            <section className="mb-12 mx-auto">
               <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
                 FAQ
               </h2>
