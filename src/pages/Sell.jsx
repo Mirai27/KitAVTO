@@ -118,56 +118,62 @@ export default function Sell() {
         {formVisible && (
           <>
             <section className="mb-12 bg-white p-6 rounded-2xl shadow-md">
-              <h1 className="text-2xl font-bold mb-6">
-                Форма подачи объявления
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                Продать машину
               </h1>
+              <p className="text-lg md:text-xl text-gray-600 mb-6">
+                Разместите своё объявление и получите максимум просмотров
+              </p>
 
-              <div className="flex items-center space-x-6 mb-6">
-                <div className="w-32 h-32 bg-gray-100 border rounded-xl flex items-center justify-center text-gray-400 text-3xl overflow-hidden">
-                  {uploadedImage ? (
-                    <img
-                      src={uploadedImage}
-                      alt="Загруженное изображение"
-                      className="w-full h-full object-cover"
+              <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6 mb-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-40 h-40 lg:w-58 lg:h-58 bg-gray-100 border rounded-xl flex items-center justify-center text-gray-400 text-3xl overflow-hidden">
+                    {uploadedImage ? (
+                      <img
+                        src={uploadedImage}
+                        alt="Загруженное изображение"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaCamera />
+                    )}
+                  </div>
+                  <label className="text-purple-600 font-medium underline cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
                     />
-                  ) : (
-                    <FaCamera />
-                  )}
+                    Добавить фотографии
+                  </label>
                 </div>
-                <label className="text-purple-600 font-medium underline cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                  Добавить фотографии
-                </label>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                  <input placeholder="Заголовок" className="input" />
+                  <input placeholder="Телефон" className="input" />
+                  <input placeholder="Почта" className="input" />
+                  <input placeholder="Марка" className="input" />
+                  <input placeholder="Модель" className="input" />
+                  <input placeholder="Поколение" className="input" />
+                  <input placeholder="Кузов" className="input" />
+                  <input placeholder="Коробка" className="input" />
+                  <input placeholder="Привод" className="input" />
+                  <input placeholder="Пробег" className="input" />
+                  <input placeholder="Двигатель" className="input" />
+                  <input placeholder="Объём двигателя" className="input" />
+                  <input placeholder="Год" className="input" />
+                  <input placeholder="Цена" className="input" />
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                <input placeholder="Заголовок" className="input" />
-                <input placeholder="Телефон" className="input" />
-                <input placeholder="Почта" className="input" />
-                <input placeholder="Марка" className="input" />
-                <input placeholder="Модель" className="input" />
-                <input placeholder="Поколение" className="input" />
-                <input placeholder="Кузов" className="input" />
-                <input placeholder="Коробка" className="input" />
-                <input placeholder="Привод" className="input" />
-                <input placeholder="Пробег" className="input" />
-                <input placeholder="Двигатель" className="input" />
-                <input placeholder="Объём двигателя" className="input" />
-                <input placeholder="Год" className="input" />
-                <input placeholder="Цена" className="input" />
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => setCommentVisible(true)}
+                  className="text-purple-600 font-medium underline"
+                >
+                  Добавить комментарий
+                </button>
               </div>
-
-              <button
-                onClick={() => setCommentVisible(true)}
-                className="text-purple-600 font-medium underline mb-4"
-              >
-                Добавить комментарий
-              </button>
 
               {commentVisible && (
                 <textarea
@@ -179,7 +185,7 @@ export default function Sell() {
                 />
               )}
 
-              <div>
+              <div className="flex justify-end">
                 <button
                   onClick={handlePublish}
                   className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
