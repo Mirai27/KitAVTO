@@ -61,11 +61,11 @@ export default function Parts() {
         <section>
           <h2 className="text-2xl font-bold mb-4">Акции</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {["/promo1.jpg", "/promo2.jpg", "/promo3.jpg", "/promo4.jpg", "/promo5.jpg", "/promo6.jpg"].map(
+            {["/promo1.jpg", "/promo1.jpg", "/promo1.jpg", "/promo1.jpg", "/promo1.jpg", "/promo1.jpg"].map(
               (image, index) => (
                 <img
                   key={index}
-                  src={image}
+                  src={"/api/images" + image}
                   alt={`Акция ${index + 1}`}
                   className="w-full h-48 object-cover rounded-lg shadow-md"
                 />

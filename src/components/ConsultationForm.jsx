@@ -12,7 +12,7 @@ export default function ConsultationForm() {
           
           <button
             type="submit"
-            className="w-full bg-accent text-white py-2 px-4 font-medium rounded-2xl hover:bg-purple-700 transition-colors"
+            className="w-full bg-accent text-white py-2 px-4 font-medium rounded-2xl hover:bg-yellow-500 transition-colors"
           >
             Отправить заявку
           </button>

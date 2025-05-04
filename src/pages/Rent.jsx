@@ -4,23 +4,8 @@ import RentFAQ from "../components/RentFAQ"; // Импортируем RentFAQ
 import ConsultationForm from "../components/ConsultationForm"; // Импортируем ConsultationForm
 
 export default function Rent() {
-  const [filterVars, setFilterVars] = useState({
-    available_types: [],
-    available_capacity: [],
-    additional_params: [],
-    available_places: [],
-  });
-  const [filters, setFilters] = useState({
-    car_type: [],
-    capacity: [],
-    additional_params: [],
-    // place_from: null,
-    date_from: "",
-    time_from: "",
-    place_to: null,
-    date_to: "",
-    time_to: "",
-  });
+  const [filterVars, setFilterVars] = useState({});
+  const [filters, setFilters] = useState({});
   const baseLimit = 6; // Initial number of cars to load
   const shiftLimit = 6; // Number of cars to load on each button click
   const [cars, setCars] = useState([]);
@@ -31,7 +16,16 @@ export default function Rent() {
     // Fetch filter variables
     fetch("/api/rent/get_variables")
       .then((res) => res.json())
-      .then((data) => setFilterVars(data))
+      .then((data) => {
+        setFilterVars(data);
+
+        // Инициализируем filters на основе ключей из filterVars
+        const initialFilters = Object.keys(data).reduce((acc, key) => {
+          acc[key] = Array.isArray(data[key]) ? [] : null; // Массив для множественного выбора, null для одиночного
+          return acc;
+        }, {});
+        setFilters(initialFilters);
+      })
       .catch((err) => console.error("Error fetching filter variables:", err));
   }, []);
 
@@ -100,88 +94,27 @@ export default function Rent() {
           {/* Filters */}
           <div className="bg-white p-4 rounded-lg shadow-md">
             <h1 className="text-xl font-bold mb-4">Фильтры</h1>
-            {/* Car Types */}
-            <div className="mb-4">
-              <h2 className="font-semibold mb-2">Тип автомобиля</h2>
-              {filterVars.available_types.map((type) => (
-                <label
-                  key={type.key}
-                  className="mb-2 flex items-center text-md"
-                >
-                  {" "}
-                  {/* Используем flex для выравнивания */}
-                  <input
-                    type="checkbox"
-                    className="mr-4 w-6 h-6" // Устанавливаем размер чекбокса равным тексту
-                    style={{ accentColor: "rgb(var(--color-primary))" }}
-                    onChange={() => handleCheckboxChange("car_type", type.key)}
-                  />
-                  {type.value} ({type.amount})
-                </label>
-              ))}
-            </div>
-            {/* Capacity */}
-            <div className="mb-4">
-              <h2 className="font-semibold mb-2">Вместимость</h2>
-              {filterVars.available_capacity.map((capacity) => (
-                <label
-                  key={capacity.key}
-                  className="flex mb-2 items-center text-md"
-                >
-                  {" "}
-                  {/* Используем flex для выравнивания */}
-                  <input
-                    type="checkbox"
-                    className="mr-4 w-6 h-6" // Устанавливаем размер чекбокса равным тексту
-                    style={{ accentColor: "rgb(var(--color-primary))" }}
-                    onChange={() =>
-                      handleCheckboxChange("capacity", capacity.key)
-                    }
-                  />
-                  {capacity.value} ({capacity.amount})
-                </label>
-              ))}
-            </div>
-            {/* Additional Params */}
-            <div className="mb-4">
-              <h2 className="font-semibold mb-2">Дополнительно</h2>
-              {filterVars.additional_params.map((param) => (
-                <label
-                  key={param.key}
-                  className="flex mb-2 items-center text-md"
-                >
-                  {" "}
-                  {/* Используем flex для выравнивания */}
-                  <input
-                    type="checkbox"
-                    className="mr-4 w-6 h-6" // Устанавливаем размер чекбокса равным тексту
-                    style={{ accentColor: "rgb(var(--color-primary))" }}
-                    onChange={() =>
-                      handleCheckboxChange("additional_params", param.key)
-                    }
-                  />
-                  {param.value} ({param.amount})
-                </label>
-              ))}
-            </div>
-            {/* Places */}
-            {/* <div className="mb-4">
-              <h2 className="font-semibold mb-2">Место</h2>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={filters.place_from || ""}
-                onChange={(e) =>
-                  setFilters({ ...filters, place_from: e.target.value || null })
-                }
-              >
-                <option value="">Выберите место</option>
-                {filterVars.available_places.map((place) => (
-                  <option key={place.key} value={place.key}>
-                    {place.value}
-                  </option>
+            {Object.entries(filterVars).map(([key, options]) => (
+              <div className="mb-4" key={key}>
+                <h2 className="font-semibold mb-2">{key}</h2>
+                {options.map((option) => (
+                  <label
+                    key={option.key}
+                    className="mb-2 flex items-center text-md"
+                  >
+                    {" "}
+                    {/* Используем flex для выравнивания */}
+                    <input
+                      type="checkbox"
+                      className="mr-4 w-6 h-6" // Устанавливаем размер чекбокса равным тексту
+                      style={{ accentColor: "rgb(var(--color-primary))" }}
+                      onChange={() => handleCheckboxChange(key, option.key)}
+                    />
+                    {option.value} ({option.amount})
+                  </label>
                 ))}
-              </select>
-            </div> */}
+              </div>
+            ))}
           </div>
 
           {/* Cars Grid */}

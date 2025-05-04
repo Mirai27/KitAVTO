@@ -15,9 +15,9 @@ const ProductCard = ({ product }) => {
     >
       <div className="h-48 bg-gray-100 flex items-center justify-center">
         <img
-          src={product.image_url || "/placeholder-product.jpg"}
+          src={"/api/images" + product.image_url || "/placeholder-product.jpg"}
           alt={product.name}
-          className="h-full w-full object-contain"
+          className="h-full w-full object-cover"
         />
       </div>
       <div className="p-4">
