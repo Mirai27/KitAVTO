@@ -31,7 +31,9 @@ function App() {
           </Routes>
         </PageTransition>
       </div>
-      <Footer />
+      <PageTransition>
+        <Footer />
+      </PageTransition>
     </div>
   );
 }

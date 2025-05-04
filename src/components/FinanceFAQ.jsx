@@ -23,7 +23,7 @@ export default function FinanceFAQ() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="mx-auto">
       <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">FAQ</h2>
       <ul className="space-y-2 md:space-y-3">
         {faqs.map((faq, index) => (

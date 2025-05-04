@@ -1,6 +1,7 @@
 import ComparisonCards from "../components/ComparisonCards";
 import ConsultationForm from "../components/ConsultationForm";
 import FinanceFAQ from "../components/FinanceFAQ";
+import Calculator from "../components/Calculator";
 
 export default function Finance() {
   return (
@@ -17,6 +18,10 @@ export default function Finance() {
 
         <section className="mb-12">
           <ComparisonCards />
+        </section>
+
+        <section className="mb-12">
+          <Calculator />
         </section>
 
         <section className="mb-12">

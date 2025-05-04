@@ -1,8 +1,16 @@
+import { motion } from "framer-motion";
 import "./Footer.css";
 
 export default function Footer() {
   return (
-    <footer className="bg-white text-gray-800 font-sans pt-8 pb-6">
+    <motion.footer
+      key="footer"
+      className="bg-white text-gray-800 font-sans pt-8 pb-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="container mx-auto flex flex-col lg:flex-row justify-between px-4 transition-normal duration-300 ease-out">
         {/* Заголовок и подзаголовок */}
         <div className="mb-8 lg:mb-0">
@@ -52,6 +60,6 @@ export default function Footer() {
         <span className="footer-link">Privacy & Policy</span>
         <span className="footer-link">Terms & Condition</span>
       </div>
-    </footer>
+    </motion.footer>
   );
 }
