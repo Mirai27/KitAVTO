@@ -9,6 +9,7 @@ import Rent from "./pages/Rent";
 import Reviews from "./pages/Reviews"; // Импортируем Reviews
 import Parts from "./pages/Parts"; // Импортируем Parts
 import Tires from "./pages/Tires"; // Импортируем Tires
+import LeaveReview from "./pages/LeaveReview"; // Импортируем LeaveReview
 import PageTransition from "./components/PageTransition";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/reviews" element={<Reviews />} /> {/* Новый маршрут */}
             <Route path="/parts" element={<Parts />} /> {/* Новый маршрут */}
             <Route path="/tires" element={<Tires />} /> {/* Новый маршрут */}
+            <Route path="/leavereview" element={<LeaveReview />} /> {/* Новый маршрут */}
           </Routes>
         </PageTransition>
       </div>

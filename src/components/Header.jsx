@@ -14,6 +14,7 @@ export default function Header() {
     reviews: "Отзывы и сравнения",
     parts: "Запчасти",
     tires: "Шины",
+    leavereview: "Оставить отзыв",
   };
 
   const breadcrumbs = location.pathname

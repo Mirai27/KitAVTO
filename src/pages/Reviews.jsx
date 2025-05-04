@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import CarCard from "../components/CarCard";
 
 export default function Reviews() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("Отзывы"); // "Отзывы" или "Сравнения"
   const [replies, setReplies] = useState([]);
   const [limit, setLimit] = useState(4);
@@ -81,7 +83,10 @@ export default function Reviews() {
               Реальные мнения владельцев и удобный инструмент сравнения
             </p>
           </div>
-          <button className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors">
+          <button
+            onClick={() => navigate("/leavereview")}
+            className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+          >
             Написать отзыв
           </button>
         </div>
