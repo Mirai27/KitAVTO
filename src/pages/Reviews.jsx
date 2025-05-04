@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
+import CarCard from "../components/CarCard";
 
 export default function Reviews() {
   const [activeSection, setActiveSection] = useState("Отзывы"); // "Отзывы" или "Сравнения"
   const [replies, setReplies] = useState([]);
   const [limit, setLimit] = useState(4);
   const [loading, setLoading] = useState(false);
+  const [models, setModels] = useState([]);
+  const [selectedModels, setSelectedModels] = useState([null, null]);
+  const [modelSpecs, setModelSpecs] = useState([null, null]);
 
   useEffect(() => {
     if (activeSection === "Отзывы") {
       fetchReplies();
+    } else if (activeSection === "Сравнения") {
+      fetchModels();
     }
   }, [limit, activeSection]);
 
@@ -25,6 +31,39 @@ export default function Reviews() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchModels = async () => {
+    try {
+      const response = await fetch(`/api/replies_compare/get_models`);
+      const data = await response.json();
+      setModels(data);
+    } catch (error) {
+      console.error("Ошибка при загрузке моделей:", error);
+    }
+  };
+
+  const fetchModelSpec = async (key, index) => {
+    try {
+      const response = await fetch(`/api/replies_compare/get_model_spec?key=${key}`);
+      const data = await response.json();
+      setModelSpecs((prevSpecs) => {
+        const newSpecs = [...prevSpecs];
+        newSpecs[index] = data;
+        return newSpecs;
+      });
+    } catch (error) {
+      console.error("Ошибка при загрузке характеристик модели:", error);
+    }
+  };
+
+  const handleModelSelect = (key, index) => {
+    setSelectedModels((prev) => {
+      const newSelection = [...prev];
+      newSelection[index] = key;
+      return newSelection;
+    });
+    fetchModelSpec(key, index);
   };
 
   const handleLoadMore = () => {
@@ -98,12 +137,12 @@ export default function Reviews() {
                         </div>
                       </div>
 
-                        <div className="flex items-center">
-                      <div className="text-yellow-500 text-lg">
-                        <p className="text-sm text-gray-400">{reply.date}</p>
-                        {"★".repeat(reply.rating)}
-                        {"☆".repeat(5 - reply.rating)}
-                      </div>
+                      <div className="flex items-center">
+                        <div className="text-yellow-500 text-lg">
+                          <p className="text-sm text-gray-400">{reply.date}</p>
+                          {"★".repeat(reply.rating)}
+                          {"☆".repeat(5 - reply.rating)}
+                        </div>
                       </div>
                     </div>
                     <p className="text-gray-700">{reply.text}</p>
@@ -124,7 +163,54 @@ export default function Reviews() {
             )}
           </div>
         ) : (
-          <div className="text-center py-8">Сравнения пока недоступны.</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[0, 1].map((index) => (
+              <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+                <h3 className="text-lg font-bold mb-4">Выберите модель</h3>
+                <select
+                  className="w-full border rounded px-3 py-2 mb-4"
+                  value={selectedModels[index] || ""}
+                  onChange={(e) => handleModelSelect(e.target.value, index)}
+                >
+                  <option value="">Выберите модель</option>
+                  {models.map((model) => (
+                    <option key={model.key} value={model.key}>
+                      {model.value}
+                    </option>
+                  ))}
+                </select>
+                {modelSpecs[index] && (
+                  <>
+                    <CarCard car={modelSpecs[index]} />
+                    <div className="mt-4 space-y-2">
+                      {Object.entries(modelSpecs[index])
+                        .filter(([key]) =>
+                          [
+                            "generation",
+                            "volume",
+                            "year",
+                            "seats",
+                            "fuel",
+                            "brand",
+                            "model",
+                            "body",
+                            "transmission",
+                            "engine",
+                            "drive",
+                          ].includes(key)
+                        )
+                        .map(([key, value]) => (
+                          <div key={key} className="flex justify-between">
+                            <span className="text-gray-500">{key}</span>
+                            <span className="text-black">{value}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </main>
