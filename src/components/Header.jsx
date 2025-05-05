@@ -45,7 +45,7 @@ export default function Header() {
             >
               KitAVTO
             </h1>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2 md:space-x-6">
               <button className="relative w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition">
                 <FaHeart className="text-primary text-2xl" />
               </button>
