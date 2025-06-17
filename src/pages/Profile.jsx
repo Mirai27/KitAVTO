@@ -24,6 +24,12 @@ export default function Profile() {
     fetchMe();
   }, []);
 
+  // Функция выхода
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setUser(null);
+  }
+
   return (
     <main className="bg-gray-50 py-4 h-auto flex items-center">
       <div className="container mx-auto px-4 flex justify-center">
@@ -57,6 +63,12 @@ export default function Profile() {
                 <span className="text-gray-500">Логин:</span>{" "}
                 <span className="text-black">{user.username || "—"}</span>
               </div>
+              <button
+                onClick={handleLogout}
+                className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+              >
+                Выйти
+              </button>
             </div>
           ) : (
             <div className="text-center text-gray-500">Нет данных пользователя</div>

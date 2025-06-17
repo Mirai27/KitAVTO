@@ -22,7 +22,7 @@ export default defineConfig({
     // port: 3000,
     proxy: {
       '/api': {
-        target: 'http://rntfj-92-243-182-206.a.free.pinggy.link',
+        target: 'http://rncud-92-243-182-206.a.free.pinggy.link',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         headers: {

@@ -17,6 +17,7 @@ import PageTransition from "./components/PageTransition";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
+import Liked from "./pages/Liked";
 import { AuthModalProvider, useAuthModal } from "./context/AuthModalContext";
 import { useEffect } from "react";
 
@@ -53,6 +54,7 @@ function AppContent() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<Cart />} /> {/* Корзина */}
+              <Route path="/liked" element={<Liked />} /> {/* Избранное */}
             </Routes>
           </PageTransition>
         </div>

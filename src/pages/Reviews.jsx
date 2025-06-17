@@ -27,8 +27,10 @@ export default function Reviews() {
         `/api/replies_compare/get_replies?limit=${limit}`
       );
       const data = await response.json();
-      setReplies(data);
+      // Гарантируем, что replies всегда массив
+      setReplies(Array.isArray(data.items) ? data.items : []);
     } catch (error) {
+      setReplies([]);
       console.error("Ошибка при загрузке отзывов:", error);
     } finally {
       setLoading(false);
@@ -72,6 +74,49 @@ export default function Reviews() {
     setLimit((prevLimit) => prevLimit + 4);
   };
 
+  // Словарь для перевода ключей характеристик на русский
+  const SPEC_LABELS = {
+    generation: "Поколение",
+    volume: "Объем",
+    year: "Год",
+    seats: "Вместимость",
+    fuel: "Топливо",
+    brand: "Марка",
+    model: "Модель",
+    body: "Кузов",
+    transmission: "Коробка",
+    engine: "Двигатель",
+    drive: "Привод",
+    // ...добавьте другие ключи по необходимости...
+  };
+
+  // Ключи для сравнения "хуже/лучше"
+  const COMPARE_KEYS = ["fuel", "seats", "year", "volume"];
+
+  // Функция сравнения для выделения "хуже"
+  function isWorse(key, value, otherValue) {
+    if (value === undefined || otherValue === undefined) return false;
+    // Для всех сравниваемых ключей: меньше — хуже
+    if (["fuel", "seats", "year", "volume"].includes(key)) {
+      let num = Number(value);
+      let otherNum = Number(otherValue);
+      if (key === "fuel") {
+        // Убираем l/L и пробелы, сравниваем числа
+        num = Number(String(value).replace(/[lL\s]/g, ""));
+        otherNum = Number(String(otherValue).replace(/[lL\s]/g, ""));
+      }
+      if (key === "seats") {
+        // seats может содержать "people" на конце
+        num = Number(String(value).replace(/[^\d]/g, ""));
+        otherNum = Number(String(otherValue).replace(/[^\d]/g, ""));
+      }
+      if (!isNaN(num) && !isNaN(otherNum)) {
+        return num < otherNum;
+      }
+    }
+    return false;
+  }
+
   return (
     <main className="bg-gray-50 py-4">
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
@@ -112,6 +157,8 @@ export default function Reviews() {
           <div>
             {loading && replies.length === 0 ? (
               <div className="text-center py-8">Загрузка...</div>
+            ) : replies.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">Нет отзывов</div>
             ) : (
               <div className="space-y-6">
                 {replies.map((reply) => (
@@ -122,12 +169,12 @@ export default function Reviews() {
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center">
                         <img
-                          src={`/api/images${reply.image_url}`}
+                          src={`/api/images${reply.image_path}`}
                           alt={reply.username}
                           className="w-16 h-16 rounded-full mr-4"
                         />
                         <div>
-                          <h1 className="font-bold text-xl">{reply.username}</h1>
+                          <h1 className="font-bold text-xl">{reply.full_name}</h1>
                           <p className="text-sm text-gray-400 mb-4">
                             {reply.cartype}
                           </p>
@@ -196,12 +243,40 @@ export default function Reviews() {
                             "drive",
                           ].includes(key)
                         )
-                        .map(([key, value]) => (
-                          <div key={key} className="flex justify-between">
-                            <span className="text-gray-500">{key}</span>
-                            <span className="text-black">{value}</span>
-                          </div>
-                        ))}
+                        .map(([key, value]) => {
+                          let underlineRed = false;
+                          if (
+                            COMPARE_KEYS.includes(key) &&
+                            modelSpecs[0] &&
+                            modelSpecs[1] &&
+                            modelSpecs[0][key] !== undefined &&
+                            modelSpecs[1][key] !== undefined
+                          ) {
+                            // сравниваем с другим авто
+                            const otherIdx = index === 0 ? 1 : 0;
+                            underlineRed = isWorse(
+                              key,
+                              value,
+                              modelSpecs[otherIdx][key]
+                            );
+                          }
+                          return (
+                            <div key={key} className="flex justify-between">
+                              <span className="text-gray-500">
+                                {SPEC_LABELS[key] || key}
+                              </span>
+                              <span
+                                className={
+                                  underlineRed
+                                    ? "text-black underline underline-offset-2 decoration-red-500 decoration-2"
+                                    : "text-black"
+                                }
+                              >
+                                {value}
+                              </span>
+                            </div>
+                          );
+                        })}
                     </div>
                   </>
                 )}

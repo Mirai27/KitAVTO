@@ -11,7 +11,16 @@ export default function Cart() {
       try {
         const response = await fetch("/api/parts/get_buy_cart");
         const data = await response.json();
-        setItems(data.items || []);
+        // Преобразуем структуру: [{...item, itemType}]
+        const allItems = [];
+        if (data.items) {
+          for (const itemType of ["oil_filters", "batteries", "tires"]) {
+            (data.items[itemType] || []).forEach((item) => {
+              allItems.push({ ...item, itemType });
+            });
+          }
+        }
+        setItems(allItems);
       } catch {
         setItems([]);
       } finally {
@@ -20,6 +29,13 @@ export default function Cart() {
     }
     fetchCart();
   }, []);
+
+  // Удаление товара из корзины
+  const handleRemove = (id, itemType) => {
+    setItems((prev) =>
+      prev.filter((item) => !(item.id === id && item.itemType === itemType))
+    );
+  };
 
   return (
     <main className="bg-gray-50 py-4">
@@ -31,7 +47,12 @@ export default function Cart() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {items.map((item) => (
-              <ProductCard key={item.id + item.name} product={item} />
+              <ProductCard
+                key={item.id + item.name + item.itemType}
+                product={item}
+                itemType={item.itemType}
+                onRemove={handleRemove}
+              />
             ))}
           </div>
         )}

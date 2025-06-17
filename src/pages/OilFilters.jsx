@@ -97,7 +97,7 @@ export default function OilFilters() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {oilFilters.map((filter) => (
-                <ProductCard key={filter.id} product={filter} />
+                <ProductCard key={filter.id} product={filter} itemType="oil_filters" />
               ))}
             </div>
             <div className="flex justify-center mt-6">

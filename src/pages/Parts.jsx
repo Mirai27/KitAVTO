@@ -29,7 +29,7 @@ export default function Parts() {
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
         {/* Section 1: Categories */}
         <section className="mb-12">
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4">
             {["Трансмиссия", "Подвеска", "Двигатель", "Шины", "Диски", "Аккумуляторы", "Фильтры"].map((category) => (
               <button
                 key={category}

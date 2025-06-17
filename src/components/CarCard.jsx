@@ -1,8 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-const CarCard = ({ car, per_day = false }) => {
+const CarCard = ({ car, per_day = false, onRemove }) => {
+  const [liked, setLiked] = useState(car.liked);
+  const navigate = useNavigate();
+
+  const handleLike = async (e) => {
+    e.stopPropagation(); // чтобы не срабатывал переход по карточке
+    try {
+      if (!liked) {
+        // Добавление в избранное
+        const params = new URLSearchParams({
+          item_type: per_day ? "rent_cars" : "sell_cars",
+          item_id: String(car.id),
+        }).toString();
+        await fetch(`/api/main_page/add_liked?${params}`, {
+          method: "POST",
+        });
+        setLiked(true);
+      } else {
+        // Удаление из избранного
+        const params = new URLSearchParams({
+          item_type: per_day ? "rent_cars" : "sell_cars",
+          item_id: String(car.id),
+        }).toString();
+        await fetch(`/api/main_page/add_liked?${params}`, {
+          method: "POST",
+        });
+        setLiked(false);
+        if (onRemove) onRemove();
+      }
+    } catch {
+      // Можно добавить обработку ошибки
+    }
+  };
+
+  // Переход только по кнопке
+  const handleActionClick = (e) => {
+    e.stopPropagation();
+    navigate(`/advert/${car.id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -10,23 +50,34 @@ const CarCard = ({ car, per_day = false }) => {
       exit={{ opacity: 0 }}
       transition={{
         duration: 0.3,
-        delay: 0, // Removed index-based delay for standalone component
+        delay: 0,
         ease: "easeOut",
       }}
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+      // убрали onClick={handleCardClick}
     >
       {/* Название и тип кузова над картинкой */}
       <div className="p-4 pb-0">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">{car.brand + " " + car.model}</h3>
-          <FaHeart
-            size={20}
-            color={car.isliked ? "#ef4444" : "transparent"}
-            style={{
-              stroke: car.isliked ? "#ef4444" : "#9ca3af", // gray-400
-              strokeWidth: 40,
-            }}
-          />
+          <motion.button
+            type="button"
+            className="focus:outline-none"
+            onClick={handleLike}
+            title={liked ? "Убрать из избранного" : "В избранное"}
+            whileTap={{ scale: 1.2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <FaHeart
+              size={20}
+              color={liked ? "#ef4444" : "transparent"}
+              style={{
+                stroke: liked ? "#ef4444" : "#9ca3af",
+                strokeWidth: 40,
+                transition: "color 0.2s",
+              }}
+            />
+          </motion.button>
         </div>
         <p className="text-gray-400 text-sm font-bold">{car.body}</p>
       </div>
@@ -177,11 +228,17 @@ const CarCard = ({ car, per_day = false }) => {
             )}
           </span>
           {per_day ? (
-            <button className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors">
+            <button
+              className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+              onClick={handleActionClick}
+            >
               Арендовать
             </button>
           ) : (
-            <button className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors">
+            <button
+              className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+              onClick={handleActionClick}
+            >
               Купить
             </button>
           )}

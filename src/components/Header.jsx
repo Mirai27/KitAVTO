@@ -3,10 +3,28 @@ import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { b } from "framer-motion/client";
 import OilFilters from "../pages/OilFilters";
+import Liked from "../pages/Liked";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [userAvatar, setUserAvatar] = useState(null);
+
+  useEffect(() => {
+    async function fetchMe() {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (response.ok) {
+          const data = await response.json();
+          setUserAvatar(data.image_path || null);
+        }
+      } catch {
+        setUserAvatar(null);
+      }
+    }
+    fetchMe();
+  }, []);
 
   const pageNames = {
     sell: "Продажа авто",
@@ -23,6 +41,7 @@ export default function Header() {
     login: "Вход",
     profile: "Личный кабинет",
     cart: "Корзина",
+    liked: "Избранное",
   };
 
   const breadcrumbs = location.pathname
@@ -89,6 +108,11 @@ export default function Header() {
       title: "Корзина",
       description: "Просмотр и управление товарами в корзине",
     },
+    liked: {
+      title: "Избранное",
+      description: "Просмотр сохраненных товаров и объявлений",
+    },
+    
   };
 
   // Определяем текущий ключ страницы
@@ -121,15 +145,27 @@ export default function Header() {
               >
                 <FaShoppingCart className="text-primary text-2xl" />
               </button>
-              <button className="relative w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition">
+              <button
+                className="relative w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                onClick={() => navigate("/liked")}
+                title="Избранное"
+              >
                 <FaHeart className="text-primary text-2xl" />
               </button>
               <div
-                className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold cursor-pointer"
+                className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold cursor-pointer overflow-hidden"
                 onClick={() => navigate("/profile")}
                 title="Личный кабинет"
               >
-                П
+                {userAvatar ? (
+                  <img
+                    src={"/api/images" + userAvatar}
+                    alt="Аватар"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  "П"
+                )}
               </div>
             </div>
           </div>

@@ -1,9 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaHeart } from "react-icons/fa";
 
 // Можно добавить отображение характеристик, если product содержит нужные поля
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, itemType, onRemove }) => {
+  const [liked, setLiked] = useState(product.liked);
+
+  const handleLike = async () => {
+    if (!itemType) return;
+    try {
+      // Передаем параметры как query, а не в body
+      const params = new URLSearchParams({
+        item_type: itemType,
+        item_id: String(product.id),
+      }).toString();
+      await fetch(`/api/main_page/add_liked?${params}`, {
+        method: "POST",
+      });
+      setLiked(true);
+    } catch {
+      // Можно добавить обработку ошибки
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!itemType) return;
+    try {
+      // Передаем параметры как query, а не в body
+      const params = new URLSearchParams({
+        item_type: itemType,
+        item_id: String(product.id),
+      }).toString();
+      await fetch(`/api/parts/add_buy_item?${params}`, {
+        method: "POST",
+      });
+      // Можно добавить уведомление об успехе
+    } catch {
+      // Можно добавить обработку ошибки
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!itemType) return;
+    try {
+      const params = new URLSearchParams({
+        item_type: itemType,
+        item_id: String(product.id),
+      }).toString();
+      await fetch(`/api/parts/add_buy_item?${params}`, {
+        method: "POST",
+      });
+      if (onRemove) onRemove(product.id, itemType);
+    } catch {
+      // Можно добавить обработку ошибки
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -19,14 +71,35 @@ const ProductCard = ({ product }) => {
       <div className="p-4 pb-0">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">{product.name}</h3>
-          <FaHeart
-            size={20}
-            color={product.liked ? "#ef4444" : "transparent"}
-            style={{
-              stroke: product.liked ? "#ef4444" : "#9ca3af",
-              strokeWidth: 40,
-            }}
-          />
+          {itemType ? (
+            <motion.button
+              type="button"
+              className="focus:outline-none"
+              onClick={handleLike}
+              title={liked ? "Добавлено в избранное" : "В избранное"}
+              whileTap={{ scale: 1.2 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <FaHeart
+                size={20}
+                color={liked ? "#ef4444" : "transparent"}
+                style={{
+                  stroke: liked ? "#ef4444" : "#9ca3af",
+                  strokeWidth: 40,
+                  transition: "color 0.2s",
+                }}
+              />
+            </motion.button>
+          ) : (
+            <FaHeart
+              size={20}
+              color={product.liked ? "#ef4444" : "transparent"}
+              style={{
+                stroke: product.liked ? "#ef4444" : "#9ca3af",
+                strokeWidth: 40,
+              }}
+            />
+          )}
         </div>
         {/* Можно добавить тип/категорию продукта, если есть */}
         {product.category && (
@@ -66,7 +139,6 @@ const ProductCard = ({ product }) => {
           </div>
         )}
         <div className="mt-4 flex justify-between items-center">
-
           <span className="text-lg font-bold">
             {product.price} ₽
             {product.old_price && (
@@ -75,9 +147,27 @@ const ProductCard = ({ product }) => {
               </div>
             )}
           </span>
-          <button className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors">
-            В корзину
-          </button>
+          <div className="flex gap-2">
+            {/* Показываем только одну из кнопок: либо "В корзину", либо "Удалить" */}
+            {onRemove ? (
+              <motion.button
+                whileTap={{ scale: 1.1 }}
+                className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 transition-colors"
+                onClick={handleRemove}
+                title="Удалить из корзины"
+              >
+                Удалить
+              </motion.button>
+            ) : itemType ? (
+              <motion.button
+                whileTap={{ scale: 1.1 }}
+                className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+                onClick={handleAddToCart}
+              >
+                В корзину
+              </motion.button>
+            ) : null}
+          </div>
         </div>
       </div>
     </motion.div>
