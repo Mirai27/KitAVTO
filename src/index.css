@@ -15,8 +15,14 @@ html {
   .bg-accent {
     background-color: rgb(var(--color-primary));
   }
+  .text-accent {
+    color: rgb(var(--color-primary));
+  }
   
   .filter-input {
-    @apply w-full p-2 border border-gray-300 rounded-md focus:ring-[rgb(100,24,127)] focus:border-[rgb(100,24,127)];
+    @apply w-full p-2 border border-gray-300 rounded-4xl focus:ring-[rgb(100,24,127)] focus:border-[rgb(100,24,127)] text-gray-400;
   }
 }
+  .filter-input::placeholder {
+    @apply text-gray-400;
+  }

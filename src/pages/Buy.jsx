@@ -2,6 +2,26 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CarCard from "../components/CarCard";
 
+// Словарь для отображения ключей фильтров
+const FILTER_LABELS = {
+  brand: "Марка",
+  model: "Модель",
+  body: "Кузов",
+  generation: "Поколение",
+  engine: "Двигатель",
+  transmission: "Коробка",
+  drive: "Привод",
+  fuel: "Топливо",
+  seats: "Вместимость",
+  color: "Цвет",
+  volume: "Объем",
+  year: "Год",
+  volume_from: "Объем (От)",
+  volume_to: "Объем (До)",
+  year_from: "Год (От)",
+  year_to: "Год (До)",
+};
+
 export default function Buy() {
   const [filterVars, setFilterVars] = useState({});
   const [filters, setFilters] = useState({
@@ -17,15 +37,15 @@ export default function Buy() {
   const [limit, setLimit] = useState(baseLimit);
 
   useEffect(() => {
-    // Fetch filter variables
+    // Асинхронный запрос по шаблону
     fetch("/api/buy_car/get_variables")
       .then((res) => res.json())
       .then((data) => {
         setFilterVars(data);
-
+        console.log("Fetched filter variables:", data);
         // Инициализируем filters на основе ключей из filterVars
         const initialFilters = Object.keys(data).reduce((acc, key) => {
-          acc[key] = Array.isArray(data[key]) ? null : null; // null для одиночного выбора
+          acc[key] = null; // теперь значения, а не массив объектов
           return acc;
         }, {});
 
@@ -38,7 +58,7 @@ export default function Buy() {
           mileage_to: null,
         });
       })
-      .catch((err) => console.error("Fetch filter vars error:", err));
+      .catch((err) => console.error("Error fetching filter variables:", err));
   }, []);
 
   const buildQueryString = () => {
@@ -62,13 +82,13 @@ export default function Buy() {
           `/api/buy_car/get_cars?${buildQueryString()}`
         );
         const data = await response.json();
+        console.log("Fetched car data:", data);
         if (data.detail) {
           console.error("Car data error:", data.detail);
           return;
         }
-        setCars(data); // Обновляем список машин
+        setCars(data.items); // Обновляем список машин
       } catch (err) {
-        console.error("Fetch car data error:", err);
       } finally {
         setLoading(false);
       }
@@ -106,131 +126,150 @@ export default function Buy() {
         transition={{ duration: 0.3 }}
       >
         <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
+          
           {/* Filter Panel */}
-          <div className="bg-gray-50 p-4 rounded-lg mb-6 shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {/* Остальные фильтры */}
+          <div className="bg-white p-4 rounded-lg mb-6 shadow-sm">
+            {/* Грид для brand, model, generation */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+              {["brand", "model", "generation"].map((key) =>
+                filterVars[key] ? (
+                  <div key={key}>
+                    <select
+                      className="filter-input"
+                      value={filters[key] || ""}
+                      onChange={(e) => handleSelectChange(key, e.target.value)}
+                    >
+                      <option value="">
+                        {FILTER_LABELS[key] ||
+                          key.charAt(0).toUpperCase() + key.slice(1)}
+                      </option>
+                      {filterVars[key].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : null
+              )}
+            </div>
+            {/* Грид для остальных фильтров */}
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
               {Object.entries(filterVars).map(([key, options]) => {
-                if (key === "volume" || key === "year") {
-                  // Поля для ввода диапазона
-                  return (
-                    <div className="flex space-x-2" key={key}>
-                      <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {key === "volume"
-                            ? "Объем"
-                            : key === "year"
-                            ? "Год"
-                            : ""}{" "}
-                          (От)
-                        </label>
-                        <input
-                          type="number"
-                          className="filter-input"
-                          value={filters[`${key}From`] || ""}
-                          onChange={(e) =>
-                            handleInputChange(`${key}From`, e.target.value)
-                          }
-                          placeholder="От"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {key === "volume"
-                            ? "Объем"
-                            : key === "year"
-                            ? "Год"
-                            : ""}{" "}
-                          (До)
-                        </label>
-                        <input
-                          type="number"
-                          className="filter-input"
-                          value={filters[`${key}To`] || ""}
-                          onChange={(e) =>
-                            handleInputChange(`${key}To`, e.target.value)
-                          }
-                          placeholder="До"
-                        />
-                      </div>
-                    </div>
-                  );
-                } else {
-                  // Dropdown menu
-                  return (
-                    <div key={key}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                      </label>
-                      <select
-                        className="filter-input"
-                        value={filters[key] || ""}
-                        onChange={(e) => handleSelectChange(key, e.target.value)}
-                      >
-                        <option value="">Все</option>
-                        {options.map((option) => (
-                          <option key={option.key} value={option.key}>
-                            {option.value}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
+                if (
+                  key === "brand" ||
+                  key === "model" ||
+                  key === "generation" ||
+                  key === "year_from" ||
+                  key === "year_to" ||
+                  key === "volume_from" ||
+                  key === "volume_to"
+                ) {
+                  return null;
                 }
+                return (
+                  <div key={key}>
+                    <select
+                      className="filter-input"
+                      value={filters[key] || ""}
+                      onChange={(e) => handleSelectChange(key, e.target.value)}
+                    >
+                      <option value="">
+                        {FILTER_LABELS[key] ||
+                          key.charAt(0).toUpperCase() + key.slice(1)}
+                      </option>
+                      {options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
               })}
-              <div className="flex space-x-2">
-                <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Цена
-                  </label>
-                  <div className="flex flex-row gap-2">
-                    <input
-                      type="number"
-                      className="filter-input"
-                      value={filters.price_from || ""}
-                      onChange={(e) =>
-                        handleInputChange("price_from", e.target.value)
-                      }
-                      placeholder="От"
-                    />
-                    <input
-                      type="number"
-                      className="filter-input"
-                      value={filters.price_to || ""}
-                      onChange={(e) =>
-                        handleInputChange("price_to", e.target.value)
-                      }
-                      placeholder="До"
-                    />
-                  </div>
-                </div>
+              {/* Цена (От/До) */}
+              <div className="flex space-x-2 col-span-2">
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.price_from || ""}
+                  onChange={(e) =>
+                    handleInputChange("price_from", e.target.value)
+                  }
+                  placeholder="Цена (От)"
+                />
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.price_to || ""}
+                  onChange={(e) =>
+                    handleInputChange("price_to", e.target.value)
+                  }
+                  placeholder="Цена (До)"
+                />
               </div>
-              <div className="flex space-x-2">
-                <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Пробег
-                  </label>
-                  <div className="flex flex-row gap-2">
-                    <input
-                      type="number"
-                      className="filter-input"
-                      value={filters.mileage_from || ""}
-                      onChange={(e) =>
-                        handleInputChange("mileage_from", e.target.value)
-                      }
-                      placeholder="От"
-                    />
-                    <input
-                      type="number"
-                      className="filter-input"
-                      value={filters.mileage_to || ""}
-                      onChange={(e) =>
-                        handleInputChange("mileage_to", e.target.value)
-                      }
-                      placeholder="До"
-                    />
-                  </div>
-                </div>
+              {/* Пробег (От/До) */}
+              <div className="flex space-x-2 col-span-2">
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.mileage_from || ""}
+                  onChange={(e) =>
+                    handleInputChange("mileage_from", e.target.value)
+                  }
+                  placeholder="Пробег (От)"
+                />
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.mileage_to || ""}
+                  onChange={(e) =>
+                    handleInputChange("mileage_to", e.target.value)
+                  }
+                  placeholder="Пробег (До)"
+                />
+              </div>
+              {/* Объем (От/До) */}
+              <div className="flex space-x-2 col-span-2">
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.volume_from || ""}
+                  onChange={(e) =>
+                    handleInputChange("volume_from", e.target.value)
+                  }
+                  placeholder="Объем (От)"
+                />
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.volume_to || ""}
+                  onChange={(e) =>
+                    handleInputChange("volume_to", e.target.value)
+                  }
+                  placeholder="Объем (До)"
+                />
+              </div>
+              {/* Год (От/До) */}
+              <div className="flex space-x-2 col-span-2">
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.year_from || ""}
+                  onChange={(e) =>
+                    handleInputChange("year_from", e.target.value)
+                  }
+                  placeholder="Год (От)"
+                />
+                <input
+                  type="number"
+                  className="filter-input"
+                  value={filters.year_to || ""}
+                  onChange={(e) =>
+                    handleInputChange("year_to", e.target.value)
+                  }
+                  placeholder="Год (До)"
+                />
               </div>
             </div>
           </div>

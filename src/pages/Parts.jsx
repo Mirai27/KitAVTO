@@ -13,7 +13,7 @@ export default function Parts() {
       try {
         const response = await fetch("/api/parts/offers?limit=4");
         const data = await response.json();
-        setRecommendedParts(data);
+        setRecommendedParts(data.items);
       } catch (error) {
         console.error("Ошибка при загрузке рекомендуемых запчастей:", error);
       } finally {
@@ -29,13 +29,16 @@ export default function Parts() {
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
         {/* Section 1: Categories */}
         <section className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-6">Запчасти и шины</h1>
-          <div className="flex flex-wrap gap-4">
-            {["Трансмиссия", "Подвеска", "Шины"].map((category) => (
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4">
+            {["Трансмиссия", "Подвеска", "Двигатель", "Шины", "Диски", "Аккумуляторы", "Фильтры"].map((category) => (
               <button
                 key={category}
                 className="px-6 py-3 bg-white font-semibold text-gray-800 border-2 border-transparent rounded-lg hover:border-[rgb(var(--color-primary))] transition-colors"
-                onClick={() => category === "Шины" && navigate("/tires")}
+                onClick={() => {
+                  if (category === "Шины") navigate("/tires");
+                  else if (category === "Аккумуляторы") navigate("/batteries");
+                  else if (category === "Фильтры") navigate("/oilfilters");
+                }}
               >
                 {category}
               </button>
@@ -49,7 +52,7 @@ export default function Parts() {
           {loading ? (
             <div className="text-center py-8">Загрузка...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4 gap-6">
               {recommendedParts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

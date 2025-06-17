@@ -90,11 +90,12 @@ export default function Calculator() {
             <button
               key={bankId}
               onClick={() => handleBankSelect(bankId)}
-              className={`w-12 h-12 rounded-full border-2 ${
+              className={`w-12 h-12 p-1 md:w-16 md:h-16 md:p-2 rounded-full border-2 ${
                 bank === bankId ? "border-blue-500" : "border-gray-300"
               }`}
             >
               <img
+                // src={`/api/images/bank${bankId}.png`}
                 src={`/images/bank${bankId}.png`}
                 alt={`Банк ${bankId}`}
                 className="w-full h-full object-contain"

@@ -5,30 +5,21 @@ import CarCard from "../components/CarCard";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
-  const baseLimit = 4; // Initial number of cars to load
-  const shiftLimit = 4; // Number of cars to load on each button click
   const [superOffers, setSuperOffers] = useState([]);
-  const [limit, setLimit] = useState(baseLimit);
 
   useEffect(() => {
     async function fetchSuperOffers() {
       try {
-        const response = await fetch(
-          `/api/main_page/superoffers?limit=${limit}`
-        );
+        const response = await fetch(`/api/main_page/superoffers`);
         const data = await response.json();
-        setSuperOffers(data);
+        setSuperOffers(data.items);
       } catch (error) {
         console.error("Ошибка при загрузке суперпредложений:", error);
       }
     }
 
     fetchSuperOffers();
-  }, [limit]);
-
-  const handleLoadMore = () => {
-    setLimit((prevLimit) => prevLimit + shiftLimit);
-  };
+  }, []);
 
   return (
     <main className="bg-gray-50 py-4">
@@ -42,19 +33,13 @@ export default function Home() {
         </ul>
       </section>
       <section className="container mx-auto px-4 mt-8 transition-normal duration-300 ease-out">
-        <h2 className="text-3xl font-bold text-blue-500 text-center mb-4">Суперпредложение</h2>
+        <h2 className="text-3xl font-bold text-accent text-center mb-4">
+          Суперпредложение
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {superOffers.map((car) => (
             <CarCard key={car.id} car={car} />
           ))}
-        </div>
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={handleLoadMore}
-            className="bg-accent text-white px-6 py-2 rounded-md hover:bg-yellow-500 transition-colors"
-          >
-            Посмотреть еще
-          </button>
         </div>
       </section>
     </main>

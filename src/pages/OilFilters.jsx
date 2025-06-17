@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
-// Словарь для перевода фильтров шин
+// Словарь для перевода фильтров масляных фильтров
 const FILTER_LABELS = {
   brand: "Бренд",
+  thread_size: "Размер резьбы",
+  height: "Высота",
   diameter: "Диаметр",
-  width: "Ширина",
-  // ...добавьте другие ключи по мере необходимости...
+  filtration_type: "Тип фильтрации",
 };
 
-export default function Tires() {
+export default function OilFilters() {
   const [filterVars, setFilterVars] = useState({});
   const [filters, setFilters] = useState({});
   const baseLimit = 8;
   const shiftLimit = 8;
-  const [tires, setTires] = useState([]);
+  const [oilFilters, setOilFilters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(baseLimit);
 
@@ -29,26 +30,26 @@ export default function Tires() {
   };
 
   useEffect(() => {
-    async function fetchTires() {
+    async function fetchOilFilters() {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/parts/tires/get_tires?limit=${limit}&${buildQueryString()}`
+          `/api/parts/oil_filters/get_filters?limit=${limit}&${buildQueryString()}`
         );
         const data = await response.json();
-        setTires(data.items);
+        setOilFilters(data.items);
       } catch (err) {
-        console.error("Ошибка при загрузке шин:", err);
+        console.error("Ошибка при загрузке масляных фильтров:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchTires();
+    fetchOilFilters();
   }, [filters, limit]);
 
   useEffect(() => {
-    fetch("/api/parts/tires/get_variables")
+    fetch("/api/parts/oil_filters/get_variables")
       .then((res) => res.json())
       .then((data) => setFilterVars(data))
       .catch((err) => console.error("Ошибка при загрузке фильтров:", err));
@@ -90,13 +91,13 @@ export default function Tires() {
             ))}
           </div>
         </div>
-        {loading && tires.length === 0 ? (
+        {loading && oilFilters.length === 0 ? (
           <div className="text-center py-8">Загрузка...</div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {tires.map((tire) => (
-                <ProductCard key={tire.id} product={tire} />
+              {oilFilters.map((filter) => (
+                <ProductCard key={filter.id} product={filter} />
               ))}
             </div>
             <div className="flex justify-center mt-6">

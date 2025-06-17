@@ -14,7 +14,7 @@ export default function Footer() {
       <div className="container mx-auto flex flex-col lg:flex-row justify-between px-4 transition-normal duration-300 ease-out">
         {/* Заголовок и подзаголовок */}
         <div className="mb-8 lg:mb-0">
-          <h1 className="footer-title">KitAVTO</h1>
+          <h1 className="footer-title text-primary">KitAVTO</h1>
           <p className="footer-subtitle">Современный маркетплейс китайских авто</p>
         </div>
 

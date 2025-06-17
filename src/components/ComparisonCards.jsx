@@ -49,14 +49,14 @@ export default function ComparisonCards() {
           }}
         >
           <div className="relative z-10 mb-4">
-            <h3 className="text-3xl md:text-4xl font-bold mb-4">{card.title}</h3>
-            <p className="mb-4 text-base md:text-lg leading-relaxed">{card.description}</p>
+            <h3 className="text-4xl md:text-6xl font-bold mb-6">{card.title}</h3>
+            <p className="mb-6 text-lg md:text-2xl leading-relaxed">{card.description}</p>
             
-            <div className="mb-4">
-              <h4 className="text-xl md:text-2xl font-semibold mb-3">Преимущества:</h4>
-              <ul className="space-y-3">
+            <div className="mb-6">
+              <h4 className="text-2xl md:text-4xl font-semibold mb-4">Преимущества:</h4>
+              <ul className="space-y-4">
                 {card.advantages.map((item, i) => (
-                  <li key={i} className="text-sm md:text-base leading-relaxed">
+                  <li key={i} className="text-base md:text-xl leading-relaxed">
                     {item}
                   </li>
                 ))}
@@ -64,10 +64,10 @@ export default function ComparisonCards() {
             </div>
             
             <div>
-              <h4 className="text-xl md:text-2xl font-semibold mb-3">Условия:</h4>
-              <ul className="space-y-3">
+              <h4 className="text-2xl md:text-4xl font-semibold mb-4">Условия:</h4>
+              <ul className="space-y-4">
                 {card.conditions.map((item, i) => (
-                  <li key={i} className="text-sm md:text-base leading-relaxed">
+                  <li key={i} className="text-base md:text-xl leading-relaxed">
                     {item}
                   </li>
                 ))}

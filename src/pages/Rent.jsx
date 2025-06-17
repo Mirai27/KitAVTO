@@ -3,6 +3,16 @@ import CarCard from "../components/CarCard";
 import RentFAQ from "../components/RentFAQ"; // Импортируем RentFAQ
 import ConsultationForm from "../components/ConsultationForm"; // Импортируем ConsultationForm
 
+// Словарь для отображения ключей фильтров
+const FILTER_LABELS = {
+  car_type: "Тип автомобиля",
+  capacity: "Вместимость",
+  additional_params: "Доп. параметры",
+  available_places: "Места",
+  available_bodies: "Кузов",
+  available_seats: "Вместимость"
+};
+
 export default function Rent() {
   const [filterVars, setFilterVars] = useState({});
   const [filters, setFilters] = useState({});
@@ -11,6 +21,8 @@ export default function Rent() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(baseLimit);
+  const [priceTo, setPriceTo] = useState(250000); // новое состояние для фильтра цены
+  const [draftPriceTo, setDraftPriceTo] = useState(250000); // новое состояние для отображения ползунка
 
   useEffect(() => {
     // Fetch filter variables
@@ -41,9 +53,13 @@ export default function Rent() {
       }
     });
 
+    // Добавляем price_to в строку запроса
+    params.append("price_to", priceTo);
+
     return params.toString();
   };
 
+  // В useEffect зависимости не меняются
   useEffect(() => {
     async function fetchCars() {
       setLoading(true);
@@ -52,7 +68,7 @@ export default function Rent() {
           `/api/rent/get_cars?${buildQueryString()}`
         );
         const data = await response.json();
-        setCars(data); // Убедимся, что список машин обновляется корректно
+        setCars(data.items); // Убедимся, что список машин обновляется корректно
       } catch (err) {
         console.error("Error fetching cars:", err);
       } finally {
@@ -61,7 +77,7 @@ export default function Rent() {
     }
 
     fetchCars();
-  }, [filters, limit]); // Добавляем filters в зависимости
+  }, [filters, limit, priceTo]); // priceTo — только после отпускания
 
   const handleCheckboxChange = (key, value) => {
     setFilters((prevFilters) => {
@@ -80,29 +96,46 @@ export default function Rent() {
   return (
     <main className="bg-gray-50 py-4">
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
-        <section className="bg-white py-8 shadow-md rounded-lg mb-6">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Аренда автомобиля
-            </h1>
-            <p className="text-lg text-gray-600">
-              Выберите из сотен доступных вариантов по лучшим ценам
-            </p>
-          </div>
-        </section>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters */}
           <div className="bg-white p-4 rounded-lg shadow-md">
             <h1 className="text-xl font-bold mb-4">Фильтры</h1>
+            {/* Новый фильтр по цене */}
+            <div className="mb-6">
+              <label
+                className="block font-semibold mb-2"
+                htmlFor="price-to-slider"
+              >
+                Цена от 0 до 250&nbsp;000 руб/мес
+              </label>
+              <input
+                id="price-to-slider"
+                type="range"
+                min={0}
+                max={250000}
+                step={1000}
+                value={draftPriceTo}
+                onChange={(e) => setDraftPriceTo(Number(e.target.value))}
+                onMouseUp={() => setPriceTo(draftPriceTo)}
+                onTouchEnd={() => setPriceTo(draftPriceTo)}
+                className="w-full accent-[rgb(100,24,127)]"
+              />
+              <div className="flex justify-between text-sm text-gray-400 mt-1">
+                <span>0</span>
+                <span>{draftPriceTo.toLocaleString()} ₽</span>
+                <span>250&nbsp;000</span>
+              </div>
+            </div>
             {Object.entries(filterVars).map(([key, options]) => (
               <div className="mb-4" key={key}>
-                <h2 className="font-semibold mb-2">{key}</h2>
+                <h2 className="font-semibold mb-2 text-gray-400">
+                  {FILTER_LABELS[key] || key}
+                </h2>
                 {options.map((option) => (
                   <label
                     key={option.key}
                     className="mb-2 flex items-center text-md"
                   >
-                    {" "}
                     {/* Используем flex для выравнивания */}
                     <input
                       type="checkbox"
@@ -110,7 +143,12 @@ export default function Rent() {
                       style={{ accentColor: "rgb(var(--color-primary))" }}
                       onChange={() => handleCheckboxChange(key, option.key)}
                     />
-                    {option.value} ({option.amount})
+                    {option.value}
+                    {option.amount && option.amount > 0 && (
+                      <span className="text-gray-400">
+                        &nbsp;({option.amount})
+                      </span>
+                    )}
                   </label>
                 ))}
               </div>
@@ -125,7 +163,7 @@ export default function Rent() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {cars.map((car) => (
-                    <CarCard key={car.id} car={car} />
+                    <CarCard key={car.id} car={car} per_day={true} />
                   ))}
                 </div>
                 <div className="flex justify-center mt-6">

@@ -75,43 +75,35 @@ export default function Reviews() {
   return (
     <main className="bg-gray-50 py-4">
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Отзывы и сравнения</h1>
-            <p className="text-gray-600">
-              Реальные мнения владельцев и удобный инструмент сравнения
-            </p>
+        {/* Section Switcher + "Написать отзыв" button */}
+        <div className="flex flex-col md:flex-row items-center mb-6">
+          <div className="flex space-x-4 mb-8 md:mb-0 md:mr-auto w-full md:w-auto">
+            <button
+              className={`px-4 py-2 rounded-4xl ${
+                activeSection === "Отзывы"
+                  ? "bg-accent text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setActiveSection("Отзывы")}
+            >
+              Отзывы
+            </button>
+            <button
+              className={`px-4 py-2 rounded-4xl ${
+                activeSection === "Сравнения"
+                  ? "bg-accent text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setActiveSection("Сравнения")}
+            >
+              Сравнения
+            </button>
           </div>
           <button
             onClick={() => navigate("/leavereview")}
-            className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+            className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors w-full md:w-auto"
           >
             Написать отзыв
-          </button>
-        </div>
-
-        {/* Section Switcher */}
-        <div className="flex space-x-4 mb-6">
-          <button
-            className={`px-4 py-2 rounded-4xl ${
-              activeSection === "Отзывы"
-                ? "bg-accent text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setActiveSection("Отзывы")}
-          >
-            Отзывы
-          </button>
-          <button
-            className={`px-4 py-2 rounded-4xl ${
-              activeSection === "Сравнения"
-                ? "bg-accent text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setActiveSection("Сравнения")}
-          >
-            Сравнения
           </button>
         </div>
 

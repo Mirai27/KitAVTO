@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
-// Словарь для перевода фильтров шин
+// Словарь для перевода фильтров аккумуляторов
 const FILTER_LABELS = {
   brand: "Бренд",
-  diameter: "Диаметр",
-  width: "Ширина",
+  capacity: "Ёмкость",
+  voltage: "Напряжение",
+  polarity: "Полярность",
+  terminal_type: "Тип клемм",
   // ...добавьте другие ключи по мере необходимости...
 };
 
-export default function Tires() {
+export default function Batteries() {
   const [filterVars, setFilterVars] = useState({});
   const [filters, setFilters] = useState({});
   const baseLimit = 8;
   const shiftLimit = 8;
-  const [tires, setTires] = useState([]);
+  const [batteries, setBatteries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(baseLimit);
 
@@ -29,26 +31,26 @@ export default function Tires() {
   };
 
   useEffect(() => {
-    async function fetchTires() {
+    async function fetchBatteries() {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/parts/tires/get_tires?limit=${limit}&${buildQueryString()}`
+          `/api/parts/batteries/get_batteries?limit=${limit}&${buildQueryString()}`
         );
         const data = await response.json();
-        setTires(data.items);
+        setBatteries(data.items);
       } catch (err) {
-        console.error("Ошибка при загрузке шин:", err);
+        console.error("Ошибка при загрузке аккумуляторов:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchTires();
+    fetchBatteries();
   }, [filters, limit]);
 
   useEffect(() => {
-    fetch("/api/parts/tires/get_variables")
+    fetch("/api/parts/batteries/get_variables")
       .then((res) => res.json())
       .then((data) => setFilterVars(data))
       .catch((err) => console.error("Ошибка при загрузке фильтров:", err));
@@ -90,13 +92,13 @@ export default function Tires() {
             ))}
           </div>
         </div>
-        {loading && tires.length === 0 ? (
+        {loading && batteries.length === 0 ? (
           <div className="text-center py-8">Загрузка...</div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {tires.map((tire) => (
-                <ProductCard key={tire.id} product={tire} />
+              {batteries.map((battery) => (
+                <ProductCard key={battery.id} product={battery} />
               ))}
             </div>
             <div className="flex justify-center mt-6">
