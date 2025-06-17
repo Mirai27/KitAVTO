@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -18,20 +19,17 @@ export default defineConfig({
   ],
 
   server: {
-    host: '0.0.0.0',
-    // port: 3000,
+    host: process.env.VITE_HOST,
+    port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : undefined,
     proxy: {
       '/api': {
-        target: 'http://rncud-92-243-182-206.a.free.pinggy.link',
+        target: process.env.REACT_APP_BACKEND_URL,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         headers: {
           'X-Proxy-Client': 'ViteDevServer',
-          'User-Agent': 'ViteProxyCustomUA/1.0' // Эта строка, скорее всего, не сработает
-                                                 // для переопределения браузерного User-Agent
-                                                 // или будет добавлена как дополнительная.
+          'User-Agent': 'ViteProxyCustomUA/1.0'
         }
-
       }
     }
   },
