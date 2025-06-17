@@ -27,6 +27,7 @@ export default function Login({ onSuccess }) {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.access_token);
+        window.dispatchEvent(new Event("user-auth-changed"));
         if (onSuccess) onSuccess();
         else navigate("/");
       } else {

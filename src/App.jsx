@@ -18,6 +18,8 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Liked from "./pages/Liked";
+import InfoPage from "./pages/InfoPage";
+import MyAdverts from "./pages/MyAdverts";
 import { AuthModalProvider, useAuthModal } from "./context/AuthModalContext";
 import { useEffect } from "react";
 
@@ -29,7 +31,15 @@ function AppContent() {
   useEffect(() => {
     const handler = () => setShowAuthModal(true);
     window.addEventListener("open-login-modal", handler);
-    return () => window.removeEventListener("open-login-modal", handler);
+
+    // Не показывать модалку при logout
+    const logoutHandler = () => setShowAuthModal(false);
+    window.addEventListener("user-logout", logoutHandler);
+
+    return () => {
+      window.removeEventListener("open-login-modal", handler);
+      window.removeEventListener("user-logout", logoutHandler);
+    };
   }, [setShowAuthModal]);
 
   return (
@@ -55,6 +65,8 @@ function AppContent() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<Cart />} /> {/* Корзина */}
               <Route path="/liked" element={<Liked />} /> {/* Избранное */}
+              <Route path="/info" element={<InfoPage />} />
+              <Route path="/myadverts" element={<MyAdverts />} />
             </Routes>
           </PageTransition>
         </div>

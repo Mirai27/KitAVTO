@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import "./Footer.css";
 
 export default function Footer() {
+  const navigate = useNavigate();
+
   return (
     <motion.footer
       key="footer"
@@ -24,10 +27,10 @@ export default function Footer() {
           <div>
             <h3 className="footer-column-title">О нас</h3>
             <ul className="footer-list">
-              <li className="footer-link">Концепт работы</li>
-              <li className="footer-link">Перспективы</li>
-              <li className="footer-link">Партнеры</li>
-              <li className="footer-link">Сотрудничество</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=concept")}>Концепт работы</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=perspective")}>Перспективы</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=partners")}>Партнеры</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=cooperation")}>Сотрудничество</li>
             </ul>
           </div>
 
@@ -35,10 +38,10 @@ export default function Footer() {
           <div>
             <h3 className="footer-column-title">Команда</h3>
             <ul className="footer-list">
-              <li className="footer-link">События</li>
-              <li className="footer-link">Блог</li>
-              <li className="footer-link">Карьера</li>
-              <li className="footer-link">Команда</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=events")}>События</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=blog")}>Блог</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=career")}>Карьера</li>
+              <li className="footer-link" onClick={() => navigate("/info?type=team")}>Команда</li>
             </ul>
           </div>
 
@@ -57,8 +60,8 @@ export default function Footer() {
 
       {/* Нижняя полоса */}
       <div className="border-t border-gray-200 mt-8 pt-4 text-center text-sm flex justify-center gap-4">
-        <span className="footer-link">Privacy & Policy</span>
-        <span className="footer-link">Terms & Condition</span>
+        <span className="footer-link" onClick={() => navigate("/info?type=privacy")}>Privacy & Policy</span>
+        <span className="footer-link" onClick={() => navigate("/info?type=terms")}>Terms & Condition</span>
       </div>
     </motion.footer>
   );

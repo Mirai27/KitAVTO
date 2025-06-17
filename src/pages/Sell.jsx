@@ -99,6 +99,25 @@ function FullscreenGalleryModal({ images, index, onClose, setIndex }) {
   );
 }
 
+// Русские подписи для фильтров (аналогично Buy)
+const FILTER_LABELS = {
+  brand: "Марка",
+  model: "Модель",
+  generation: "Поколение",
+  body: "Кузов",
+  transmission: "Коробка",
+  engine: "Двигатель",
+  drive: "Привод",
+  volume: "Объём двигателя",
+  seats: "Вместимость",
+  year: "Год",
+  mileage: "Пробег",
+  price: "Цена",
+  fuel: "Топливо",
+  phone: "Телефон",
+  email: "Почта",
+};
+
 export default function Sell() {
   const [formVisible, setFormVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
@@ -120,11 +139,21 @@ export default function Sell() {
     year: "",
     mileage: "",
     price: "",
+    fuel: "", // добавлено поле fuel
     phone: "",
     email: "",
     // остальные поля если нужно
   });
+  const [filterVars, setFilterVars] = useState({});
   const navigate = useNavigate(); // добавьте импорт useNavigate из react-router-dom
+
+  useEffect(() => {
+    // Получаем допустимые значения для селектов (как в Buy)
+    fetch("/api/buy_car/get_variables")
+      .then((res) => res.json())
+      .then((data) => setFilterVars(data))
+      .catch(() => setFilterVars({}));
+  }, []);
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -178,7 +207,10 @@ export default function Sell() {
       year: Number(formFields.year) || 0,
       mileage: Number(formFields.mileage) || 0,
       price: Number(formFields.price) || 0,
-      image_paths: uploadedImages.map(img => img.replace(/^\/api\/images/, "")), // убираем /api/images
+      fuel: formFields.fuel, // обязательно передаем fuel
+      image_paths: uploadedImages.map((img) =>
+        img.replace(/^\/api\/images/, "")
+      ), // убираем /api/images
       comment: comment,
       phone: formFields.phone,
       email: formFields.email,
@@ -227,12 +259,12 @@ export default function Sell() {
         {/* Intro section */}
         {!formVisible && !successMessage && (
           <>
-              <button
-                onClick={() => setFormVisible(true)}
-                className="bg-gray-700 mb-12 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition w-full md:w-auto"
-              >
-                Разместить объявление
-              </button>
+            <button
+              onClick={() => setFormVisible(true)}
+              className="bg-gray-700 mb-12 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition w-full md:w-auto"
+            >
+              Разместить объявление
+            </button>
 
             <section className="mb-12 bg-accent text-white p-6 rounded-xl shadow-md">
               <h2 className="text-xl font-semibold mb-2">
@@ -243,9 +275,8 @@ export default function Sell() {
                 трудоёмким процессом.
               </p>
               <p className="text-sm md:text-base">
-                Именно поэтому мы создали платформу,
-                которая делает этот процесс максимально простым, быстрым и
-                выгодным для вас.
+                Именно поэтому мы создали платформу, которая делает этот процесс
+                максимально простым, быстрым и выгодным для вас.
               </p>
             </section>
           </>
@@ -389,20 +420,124 @@ export default function Sell() {
                   </label>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                  <input name="brand" placeholder="Марка" className="input" value={formFields.brand} onChange={handleFieldChange} />
-                  <input name="model" placeholder="Модель" className="input" value={formFields.model} onChange={handleFieldChange} />
-                  <input name="generation" placeholder="Поколение" className="input" value={formFields.generation} onChange={handleFieldChange} />
-                  <input name="body" placeholder="Кузов" className="input" value={formFields.body} onChange={handleFieldChange} />
-                  <input name="transmission" placeholder="Коробка" className="input" value={formFields.transmission} onChange={handleFieldChange} />
-                  <input name="engine" placeholder="Двигатель" className="input" value={formFields.engine} onChange={handleFieldChange} />
-                  <input name="drive" placeholder="Привод" className="input" value={formFields.drive} onChange={handleFieldChange} />
-                  <input name="volume" placeholder="Объём двигателя" className="input" value={formFields.volume} onChange={handleFieldChange} type="number" />
-                  <input name="seats" placeholder="Вместимость" className="input" value={formFields.seats} onChange={handleFieldChange} type="number" />
-                  <input name="year" placeholder="Год" className="input" value={formFields.year} onChange={handleFieldChange} type="number" />
-                  <input name="mileage" placeholder="Пробег" className="input" value={formFields.mileage} onChange={handleFieldChange} type="number" />
-                  <input name="price" placeholder="Цена" className="input" value={formFields.price} onChange={handleFieldChange} type="number" />
-                  <input name="phone" placeholder="Телефон" className="input" value={formFields.phone} onChange={handleFieldChange} />
-                  <input name="email" placeholder="Почта" className="input" value={formFields.email} onChange={handleFieldChange} />
+                  {/* Реализация фильтров аналогично Buy: только placeholder, нет option "Все", первая option - placeholder, остальные значения */}
+                  {[
+                    "brand",
+                    "model",
+                    "generation",
+                    "body",
+                    "transmission",
+                    "engine",
+                    "drive",
+                  ].map((key) =>
+                    filterVars[key] ? (
+                      <div key={key}>
+                        <select
+                          name={key}
+                          className="input"
+                          value={formFields[key]}
+                          onChange={handleFieldChange}
+                        >
+                          <option value="" disabled hidden>
+                            {FILTER_LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1)}
+                          </option>
+                          {filterVars[key].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <div key={key}>
+                        <input
+                          name={key}
+                          placeholder={FILTER_LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1)}
+                          className="input"
+                          value={formFields[key]}
+                          onChange={handleFieldChange}
+                        />
+                      </div>
+                    )
+                  )}
+                  {/* Остальные поля с русскими подписями */}
+                  <div>
+                    <input
+                      name="volume"
+                      placeholder={FILTER_LABELS["volume"]}
+                      className="input"
+                      value={formFields.volume}
+                      onChange={handleFieldChange}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="seats"
+                      placeholder={FILTER_LABELS["seats"]}
+                      className="input"
+                      value={formFields.seats}
+                      onChange={handleFieldChange}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="year"
+                      placeholder={FILTER_LABELS["year"]}
+                      className="input"
+                      value={formFields.year}
+                      onChange={handleFieldChange}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="mileage"
+                      placeholder={FILTER_LABELS["mileage"]}
+                      className="input"
+                      value={formFields.mileage}
+                      onChange={handleFieldChange}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="price"
+                      placeholder={FILTER_LABELS["price"]}
+                      className="input"
+                      value={formFields.price}
+                      onChange={handleFieldChange}
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="fuel"
+                      placeholder={FILTER_LABELS["fuel"]}
+                      className="input"
+                      value={formFields.fuel}
+                      onChange={handleFieldChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="phone"
+                      placeholder={FILTER_LABELS["phone"]}
+                      className="input"
+                      value={formFields.phone}
+                      onChange={handleFieldChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      name="email"
+                      placeholder={FILTER_LABELS["email"]}
+                      className="input"
+                      value={formFields.email}
+                      onChange={handleFieldChange}
+                    />
+                  </div>
                 </div>
               </div>
 

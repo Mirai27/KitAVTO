@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 // Словарь для отображения ключей (может быть пустым, если не хотите переводить)
 const FIELD_LABELS = {
@@ -30,9 +30,12 @@ function humanizeKey(key) {
 
 export default function Advert() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [advert, setAdvert] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fullscreenIdx, setFullscreenIdx] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -50,6 +53,33 @@ export default function Advert() {
     }
     fetchAdvert();
   }, [id]);
+
+  // Кнопка удаления объявления
+  const handleDelete = async () => {
+    if (!window.confirm("Удалить объявление?")) return;
+    setDeleteLoading(true);
+    try {
+      const resp = await fetch(`/api/buy_car/delete_ad?car_id=${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await resp.json();
+      if (data && data.status === true) {
+        setDeleteSuccess(true);
+        setTimeout(() => {
+          navigate("/myadverts");
+        }, 1500);
+      } else {
+        alert("Ошибка при удалении");
+      }
+    } catch {
+      alert("Ошибка при удалении");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -176,6 +206,7 @@ export default function Advert() {
     "image_paths",
     "comment",
     "id",
+    "owner_id", // Скрываем owner_id
     ...contactFields.map(([key]) => key),
   ];
   const extraFields = Object.entries(advert).filter(
@@ -191,7 +222,27 @@ export default function Advert() {
         setIndex={setFullscreenIdx}
       />
       <div className="container mx-auto px-4 transition-normal duration-300 ease-out">
-        <div className="bg-white rounded-xl shadow-md p-6 md:p-10 flex flex-col gap-8">
+        <div className="bg-white rounded-xl shadow-md p-6 md:p-10 flex flex-col gap-8 relative">
+          {/* Кнопка удаления */}
+          <button
+            onClick={handleDelete}
+            disabled={deleteLoading}
+            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow transition z-10 w-9 h-9 flex items-center justify-center"
+            title="Удалить объявление"
+            style={{ padding: 0, minWidth: 0, minHeight: 0 }}
+          >
+            {deleteLoading ? (
+              <span className="text-xs">...</span>
+            ) : (
+              <span className="text-lg font-bold">×</span>
+            )}
+          </button>
+          {/* Сообщение об успехе */}
+          {deleteSuccess && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-2 rounded-lg shadow z-20">
+              Объявление успешно удалено
+            </div>
+          )}
           {/* Верхняя строка: бренд, модель, год, пробег — слева; цена — справа */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
             <div className="flex flex-col">
@@ -201,6 +252,9 @@ export default function Advert() {
                   {mainFields.year && <span>{mainFields.year}</span>}
                   {mainFields.mileage !== undefined && (
                     <span>{mainFields.mileage?.toLocaleString()} км</span>
+                  )}
+                  {mainFields.fuel !== undefined && (
+                    <span>{FIELD_LABELS.fuel}: {mainFields.fuel}</span>
                   )}
                 </span>
               </span>

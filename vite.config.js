@@ -1,6 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+console.log("VITE_BACKEND_URL from process.env:", process.env.VITE_BACKEND_URL);
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,15 +19,14 @@ export default defineConfig({
     //     },
     //   },
     // }
-  ),
-  ],
+  )],
 
   server: {
     host: process.env.VITE_HOST,
     port: process.env.VITE_PORT ? Number(process.env.VITE_PORT) : undefined,
     proxy: {
       '/api': {
-        target: process.env.REACT_APP_BACKEND_URL,
+        target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         headers: {
@@ -34,3 +37,4 @@ export default defineConfig({
     }
   },
 });
+console.log("VITE_BACKEND_URL from process.env:", process.env.VITE_BACKEND_URL);

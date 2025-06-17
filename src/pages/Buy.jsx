@@ -139,10 +139,11 @@ export default function Buy() {
                       value={filters[key] || ""}
                       onChange={(e) => handleSelectChange(key, e.target.value)}
                     >
-                      <option value="">
+                      <option value="" disabled hidden>
                         {FILTER_LABELS[key] ||
                           key.charAt(0).toUpperCase() + key.slice(1)}
                       </option>
+                      <option value="">Все</option>
                       {filterVars[key].map((option) => (
                         <option key={option} value={option}>
                           {option}
@@ -174,10 +175,11 @@ export default function Buy() {
                       value={filters[key] || ""}
                       onChange={(e) => handleSelectChange(key, e.target.value)}
                     >
-                      <option value="">
+                      <option value="" disabled hidden>
                         {FILTER_LABELS[key] ||
                           key.charAt(0).toUpperCase() + key.slice(1)}
                       </option>
+                      <option value="">Все</option>
                       {options.map((option) => (
                         <option key={option} value={option}>
                           {option}

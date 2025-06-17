@@ -5,6 +5,7 @@ import { FaHeart } from "react-icons/fa";
 // Можно добавить отображение характеристик, если product содержит нужные поля
 const ProductCard = ({ product, itemType, onRemove }) => {
   const [liked, setLiked] = useState(product.liked);
+  const [inCart, setInCart] = useState(false);
 
   const handleLike = async () => {
     if (!itemType) return;
@@ -34,6 +35,8 @@ const ProductCard = ({ product, itemType, onRemove }) => {
       await fetch(`/api/parts/add_buy_item?${params}`, {
         method: "POST",
       });
+      setInCart(true);
+      setTimeout(() => setInCart(false), 2000); // 2 секунды индикация
       // Можно добавить уведомление об успехе
     } catch {
       // Можно добавить обработку ошибки
@@ -71,7 +74,8 @@ const ProductCard = ({ product, itemType, onRemove }) => {
       <div className="p-4 pb-0">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold">{product.name}</h3>
-          {itemType ? (
+          {/* Лайк показываем только если нет onRemove (то есть не в корзине) */}
+          {!onRemove && itemType ? (
             <motion.button
               type="button"
               className="focus:outline-none"
@@ -90,16 +94,7 @@ const ProductCard = ({ product, itemType, onRemove }) => {
                 }}
               />
             </motion.button>
-          ) : (
-            <FaHeart
-              size={20}
-              color={product.liked ? "#ef4444" : "transparent"}
-              style={{
-                stroke: product.liked ? "#ef4444" : "#9ca3af",
-                strokeWidth: 40,
-              }}
-            />
-          )}
+          ) : null}
         </div>
         {/* Можно добавить тип/категорию продукта, если есть */}
         {product.category && (
@@ -161,10 +156,16 @@ const ProductCard = ({ product, itemType, onRemove }) => {
             ) : itemType ? (
               <motion.button
                 whileTap={{ scale: 1.1 }}
-                className="bg-accent text-white px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors"
+                className={
+                  "px-4 py-2 rounded-md transition-colors " +
+                  (inCart
+                    ? "bg-green-500 text-white"
+                    : "bg-accent text-white hover:bg-yellow-500")
+                }
                 onClick={handleAddToCart}
+                disabled={inCart}
               >
-                В корзину
+                {inCart ? "В корзине" : "В корзину"}
               </motion.button>
             ) : null}
           </div>

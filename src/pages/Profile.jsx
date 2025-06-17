@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchMe() {
@@ -28,6 +30,9 @@ export default function Profile() {
   function handleLogout() {
     localStorage.removeItem("token");
     setUser(null);
+    window.dispatchEvent(new Event("user-auth-changed"));
+    window.dispatchEvent(new Event("user-logout"));
+    navigate("/"); // редирект на главную
   }
 
   return (

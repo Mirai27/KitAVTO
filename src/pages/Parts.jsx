@@ -30,7 +30,7 @@ export default function Parts() {
         {/* Section 1: Categories */}
         <section className="mb-12">
           <div className="flex flex-wrap gap-4">
-            {["Трансмиссия", "Подвеска", "Двигатель", "Шины", "Диски", "Аккумуляторы", "Фильтры"].map((category) => (
+            {["Аккумуляторы", "Шины", "Фильтры"].map((category) => (
               <button
                 key={category}
                 className="px-6 py-3 bg-white font-semibold text-gray-800 border-2 border-transparent rounded-lg hover:border-[rgb(var(--color-primary))] transition-colors"
@@ -54,7 +54,7 @@ export default function Parts() {
           ) : (
             <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4 gap-6">
               {recommendedParts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} itemType="oil_filters" />
               ))}
             </div>
           )}

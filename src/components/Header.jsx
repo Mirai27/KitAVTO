@@ -1,30 +1,72 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { b } from "framer-motion/client";
 import OilFilters from "../pages/OilFilters";
 import Liked from "../pages/Liked";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const [userAvatar, setUserAvatar] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  useEffect(() => {
-    async function fetchMe() {
-      try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const data = await response.json();
-          setUserAvatar(data.image_path || null);
-        }
-      } catch {
+  // функция для обновления аватара
+  async function updateUserAvatar() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setUserAvatar(null);
+      return;
+    }
+    try {
+      const response = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserAvatar(data.image_path || "");
+      } else {
         setUserAvatar(null);
       }
+    } catch {
+      setUserAvatar(null);
     }
-    fetchMe();
+  }
+
+  useEffect(() => {
+    updateUserAvatar();
+    // слушаем событие логина/логаута
+    function handleUserChanged() {
+      updateUserAvatar();
+    }
+    window.addEventListener("user-auth-changed", handleUserChanged);
+    // слушаем изменения localStorage (например, если другой вкладкой вышли)
+    function handleStorage(e) {
+      if (e.key === "token") updateUserAvatar();
+    }
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("user-auth-changed", handleUserChanged);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
+
+  // Закрытие меню при клике вне меню
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   const pageNames = {
     sell: "Продажа авто",
@@ -42,12 +84,43 @@ export default function Header() {
     profile: "Личный кабинет",
     cart: "Корзина",
     liked: "Избранное",
+    info: "Информация",
+    myadverts: "Мои объявления",
+    register: "Регистрация",
   };
 
-  const breadcrumbs = location.pathname
-    .split("/")
-    .filter(Boolean)
-    .map((crumb) => pageNames[crumb] || crumb.charAt(0).toUpperCase() + crumb.slice(1));
+  // Формируем массив объектов для хлебных крошек: {name, path}
+  const pathParts = location.pathname.split("/").filter(Boolean);
+
+  // Специальная логика для вложенности "Шины", "Масляные фильтры", "Аккумуляторы" в "Запчасти"
+  let breadcrumbsArr = [];
+  if (
+    pathParts.length === 1 &&
+    ["tires", "oilfilters", "batteries"].includes(pathParts[0])
+  ) {
+    // Например, /tires -> /parts > /tires
+    breadcrumbsArr = [
+      { name: pageNames["parts"], path: "/parts" },
+      { name: pageNames[pathParts[0]] || pathParts[0].charAt(0).toUpperCase() + pathParts[0].slice(1), path: "/" + pathParts[0] }
+    ];
+  } else if (
+    pathParts.length > 1 &&
+    ["tires", "oilfilters", "batteries"].includes(pathParts[0])
+  ) {
+    // Если вдруг путь вида /tires/что-то, тоже вложить в parts
+    breadcrumbsArr = [
+      { name: pageNames["parts"], path: "/parts" },
+      ...pathParts.map((crumb, idx) => ({
+        name: pageNames[crumb] || crumb.charAt(0).toUpperCase() + crumb.slice(1),
+        path: "/" + pathParts.slice(0, idx + 1).join("/")
+      }))
+    ];
+  } else {
+    breadcrumbsArr = pathParts.map((crumb, idx) => ({
+      name: pageNames[crumb] || crumb.charAt(0).toUpperCase() + crumb.slice(1),
+      path: "/" + pathParts.slice(0, idx + 1).join("/")
+    }));
+  }
 
   function handleLogoAction(link, title) {
     navigate(link);
@@ -152,30 +225,73 @@ export default function Header() {
               >
                 <FaHeart className="text-primary text-2xl" />
               </button>
-              <div
-                className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold cursor-pointer overflow-hidden"
-                onClick={() => navigate("/profile")}
-                title="Личный кабинет"
-              >
-                {userAvatar ? (
-                  <img
-                    src={"/api/images" + userAvatar}
-                    alt="Аватар"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  "П"
+              {/* Аватарка и выпадающее меню */}
+              <div className="relative" ref={menuRef}>
+                <div
+                  className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold cursor-pointer overflow-hidden"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  title="Меню пользователя"
+                >
+                  {userAvatar
+                    ? <img src={"/api/images" + userAvatar} alt="Аватар" className="w-full h-full object-cover rounded-full" />
+                    : "П"}
+                </div>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-2">
+                    {userAvatar === null ? (
+                      <>
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          onClick={() => { setMenuOpen(false); navigate("/login"); }}
+                        >
+                          Войти
+                        </button>
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          onClick={() => { setMenuOpen(false); navigate("/register"); }}
+                        >
+                          Зарегистрироваться
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          onClick={() => { setMenuOpen(false); navigate("/profile"); }}
+                        >
+                          Профиль
+                        </button>
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          onClick={() => { setMenuOpen(false); navigate("/myadverts"); }}
+                        >
+                          Мои объявления
+                        </button>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
-        {breadcrumbs.length > 0 && (<hr className="mb-6 border-gray-200" />)}
-        {breadcrumbs.length > 0 && (
+        {breadcrumbsArr.length > 0 && (<hr className="mb-6 border-gray-200" />)}
+        {breadcrumbsArr.length > 0 && (
           <div className="container mx-auto px-4 transition-normal duration-300 ease-out flex flex-col">
-            
             <nav className="mb-6 text-lg text-gray-600">
-              Главная {breadcrumbs.length > 0 && " > "} {breadcrumbs.join(" > ")}
+              <Link to="/" className="hover:underline text-primary">Главная</Link>
+              {breadcrumbsArr.map((crumb, idx) => (
+                <span key={crumb.path}>
+                  {" > "}
+                  {idx < breadcrumbsArr.length - 1 ? (
+                    <Link to={crumb.path} className="hover:underline text-primary">
+                      {crumb.name}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-600">{crumb.name}</span>
+                  )}
+                </span>
+              ))}
             </nav>
           </div>
         )}
