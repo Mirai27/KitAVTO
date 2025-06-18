@@ -47,7 +47,7 @@ export default function Register() {
   };
 
   return (
-    <main className="bg-gray-50 py-4 min-h-[70vh] flex items-center">
+    <main className="bg-gray-50 py-4 flex items-center">
       <div className="container mx-auto px-4 flex justify-center">
         <form
           className="bg-white p-6 md:p-8 rounded-2xl shadow-xs border border-gray-200 max-w-md w-full"
