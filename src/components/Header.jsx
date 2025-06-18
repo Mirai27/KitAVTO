@@ -92,33 +92,41 @@ export default function Header() {
   // Формируем массив объектов для хлебных крошек: {name, path}
   const pathParts = location.pathname.split("/").filter(Boolean);
 
+  // Исключаем id объявления из хлебных крошек для advert
+  let filteredParts = pathParts;
+  if (
+    pathParts.length === 2 &&
+    pathParts[0] === "advert" &&
+    /^\d+$/.test(pathParts[1])
+  ) {
+    filteredParts = [pathParts[0]];
+  }
+
   // Специальная логика для вложенности "Шины", "Масляные фильтры", "Аккумуляторы" в "Запчасти"
   let breadcrumbsArr = [];
   if (
-    pathParts.length === 1 &&
-    ["tires", "oilfilters", "batteries"].includes(pathParts[0])
+    filteredParts.length === 1 &&
+    ["tires", "oilfilters", "batteries"].includes(filteredParts[0])
   ) {
-    // Например, /tires -> /parts > /tires
     breadcrumbsArr = [
       { name: pageNames["parts"], path: "/parts" },
-      { name: pageNames[pathParts[0]] || pathParts[0].charAt(0).toUpperCase() + pathParts[0].slice(1), path: "/" + pathParts[0] }
+      { name: pageNames[filteredParts[0]] || filteredParts[0].charAt(0).toUpperCase() + filteredParts[0].slice(1), path: "/" + filteredParts[0] }
     ];
   } else if (
-    pathParts.length > 1 &&
-    ["tires", "oilfilters", "batteries"].includes(pathParts[0])
+    filteredParts.length > 1 &&
+    ["tires", "oilfilters", "batteries"].includes(filteredParts[0])
   ) {
-    // Если вдруг путь вида /tires/что-то, тоже вложить в parts
     breadcrumbsArr = [
       { name: pageNames["parts"], path: "/parts" },
-      ...pathParts.map((crumb, idx) => ({
+      ...filteredParts.map((crumb, idx) => ({
         name: pageNames[crumb] || crumb.charAt(0).toUpperCase() + crumb.slice(1),
-        path: "/" + pathParts.slice(0, idx + 1).join("/")
+        path: "/" + filteredParts.slice(0, idx + 1).join("/")
       }))
     ];
   } else {
-    breadcrumbsArr = pathParts.map((crumb, idx) => ({
+    breadcrumbsArr = filteredParts.map((crumb, idx) => ({
       name: pageNames[crumb] || crumb.charAt(0).toUpperCase() + crumb.slice(1),
-      path: "/" + pathParts.slice(0, idx + 1).join("/")
+      path: "/" + filteredParts.slice(0, idx + 1).join("/")
     }));
   }
 
