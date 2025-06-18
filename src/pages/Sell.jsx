@@ -199,6 +199,71 @@ export default function Sell() {
 
   // Новый обработчик публикации объявления
   const handlePublish = async () => {
+    // Проверка обязательных полей (все кроме комментария)
+    const requiredFields = [
+      "brand",
+      "model",
+      "generation",
+      "body",
+      "transmission",
+      "engine",
+      "drive",
+      "volume",
+      "seats",
+      "year",
+      "mileage",
+      "price",
+      "fuel",
+      "phone",
+      "email",
+    ];
+    for (const field of requiredFields) {
+      if (!formFields[field] || String(formFields[field]).trim() === "") {
+        alert(`Пожалуйста, заполните поле "${FILTER_LABELS[field] || field}"`);
+        return;
+      }
+    }
+    if (uploadedImages.length === 0) {
+      alert("Пожалуйста, добавьте хотя бы одну фотографию.");
+      return;
+    }
+
+    // Проверка числовых полей
+    const intFields = [
+      { key: "seats", label: FILTER_LABELS["seats"] },
+      { key: "year", label: FILTER_LABELS["year"] },
+      { key: "mileage", label: FILTER_LABELS["mileage"] },
+      { key: "price", label: FILTER_LABELS["price"] },
+      { key: "fuel", label: FILTER_LABELS["fuel"] },
+    ];
+    for (const { key, label } of intFields) {
+      const val = Number(formFields[key]);
+      if (!Number.isInteger(val) || val <= 0) {
+        alert(`Поле "${label}" должно быть целым числом больше 0`);
+        return;
+      }
+    }
+    // Проверка объема двигателя (дробное число > 0)
+    const volumeVal = Number(formFields.volume);
+    if (!(volumeVal > 0)) {
+      alert('Поле "Объём двигателя" должно быть числом больше 0');
+      return;
+    }
+
+    // Проверка телефона (простой паттерн: минимум 10 цифр)
+    const phone = String(formFields.phone).replace(/\D/g, "");
+    if (phone.length < 10) {
+      alert("Пожалуйста, введите корректный номер телефона.");
+      return;
+    }
+
+    // Проверка email (простой паттерн)
+    const email = String(formFields.email);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Пожалуйста, введите корректный e-mail.");
+      return;
+    }
+
     // Собираем данные для отправки
     const advertData = {
       ...formFields,
@@ -207,10 +272,10 @@ export default function Sell() {
       year: Number(formFields.year) || 0,
       mileage: Number(formFields.mileage) || 0,
       price: Number(formFields.price) || 0,
-      fuel: formFields.fuel, // обязательно передаем fuel
+      fuel: formFields.fuel,
       image_paths: uploadedImages.map((img) =>
         img.replace(/^\/api\/images/, "")
-      ), // убираем /api/images
+      ),
       comment: comment,
       phone: formFields.phone,
       email: formFields.email,
