@@ -20,6 +20,7 @@ import Cart from "./pages/Cart";
 import Liked from "./pages/Liked";
 import InfoPage from "./pages/InfoPage";
 import MyAdverts from "./pages/MyAdverts";
+import Register from "./pages/Register";
 import { AuthModalProvider, useAuthModal } from "./context/AuthModalContext";
 import { useEffect } from "react";
 
@@ -67,6 +68,7 @@ function AppContent() {
               <Route path="/liked" element={<Liked />} /> {/* Избранное */}
               <Route path="/info" element={<InfoPage />} />
               <Route path="/myadverts" element={<MyAdverts />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </PageTransition>
         </div>
